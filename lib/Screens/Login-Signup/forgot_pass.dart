@@ -6,15 +6,14 @@ import 'package:denti_plus/Screens/Login-Signup/login.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
-class forgot_pass extends StatefulWidget {
-  const forgot_pass({Key? key}) : super(key: key);
+class ForgotPass extends StatefulWidget {
+  const ForgotPass({Key? key}) : super(key: key);
 
   @override
-  _TabBarExampleState createState() => _TabBarExampleState();
+  _ForgotPassState createState() => _ForgotPassState();
 }
 
-class _TabBarExampleState extends State<forgot_pass>
-    with SingleTickerProviderStateMixin {
+class _ForgotPassState extends State<ForgotPass> with SingleTickerProviderStateMixin {
   late TabController tabController;
 
   @override
@@ -35,116 +34,96 @@ class _TabBarExampleState extends State<forgot_pass>
       backgroundColor: Colors.white,
       appBar: AppBar(
         leading: IconButton(
-          icon: Container(
-              height: MediaQuery.of(context).size.height * 0.06,
-              width: MediaQuery.of(context).size.width * 0.06,
-              child: Image.asset("lib/icons/back2.png")),
+          icon: SizedBox(
+            height: 30,
+            width: 30,
+            child: Image.asset("lib/icons/back2.png"),
+          ),
           onPressed: () {
-            Navigator.push(
-                context,
-                PageTransition(
-                    type: PageTransitionType.topToBottom, child: login()));
+            Navigator.pop(context); // Retourner à l’écran précédent
           },
         ),
         backgroundColor: Colors.white,
         toolbarHeight: 80,
         elevation: 0,
       ),
-      body: SingleChildScrollView(
-        physics: NeverScrollableScrollPhysics(),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            children: [
-              SizedBox(
-                height: 40,
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 40),
+            Text(
+              "Mot de passe oublié?",
+              style: GoogleFonts.poppins(
+                fontSize: 20.sp,
+                fontWeight: FontWeight.w600,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
-                    "Forgot your password?",
-                    style: GoogleFonts.poppins(
-                      fontSize: 20.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  )
-                ],
+            ),
+            const SizedBox(height: 10),
+            Text(
+              "Entrez votre email ou votre téléphone, \npour recevoir un code de confirmation",
+              style: GoogleFonts.poppins(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w400,
+                color: Colors.black54,
               ),
-              SizedBox(
-                height: 10,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
-                    "Enter your email or your phone number, we\nwill send you confirmation code",
-                    style: GoogleFonts.poppins(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.black54),
-                  )
-                ],
-              ),
-              Container(
-                height: MediaQuery.of(context).size.height,
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 50,
+            ),
+            const SizedBox(height: 50),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: Container(
+                width: double.infinity,
+                height: 50, // Fixer la hauteur pour éviter les bugs d'affichage
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    width: 2,
+                    color: const Color.fromARGB(255, 3, 190, 150),
+                  ),
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(25),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 6,
+                      spreadRadius: 1,
+                      offset: const Offset(0, 3),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Container(
-                        // height: 50,
-                        width: MediaQuery.of(context).size.height,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                              color: Color.fromARGB(255, 235, 235, 235)),
-                          color: Color.fromARGB(255, 241, 241, 241),
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.all(5),
-                              child: TabBar(
-                                indicator: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(25),
-                                ),
-                                indicatorColor:
-                                    const Color.fromARGB(255, 241, 241, 241),
-                                unselectedLabelColor: Colors.grey,
-                                labelColor:
-                                    const Color.fromARGB(255, 3, 190, 150),
-                                controller: tabController,
-                                tabs: [
-                                  Tab(
-                                    text: "Email",
-                                  ),
-                                  Tab(
-                                    text: "Phone",
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Expanded(
-                        child: TabBarView(
-                            controller: tabController,
-                            children: [tab1(), tab2()]))
                   ],
                 ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(25), // Éviter le débordement de l'indicateur
+                  child: TabBar(
+                    controller: tabController,
+                    indicator: BoxDecoration(
+                      color: const Color.fromARGB(255, 3, 190, 150),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    indicatorSize: TabBarIndicatorSize.tab, // L’indicateur prend toute la taille de l’onglet
+                    labelPadding: EdgeInsets.zero, // Évite le décalage du texte
+                    unselectedLabelColor: Colors.black54,
+                    labelColor: Colors.white,
+                    labelStyle: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w500),
+                    tabs: const [
+                      Expanded(
+                        child: Tab(text: "Email"),
+                      ),
+                      Expanded(
+                        child: Tab(text: "Téléphone"),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 20),
+            Expanded(
+              child: TabBarView(
+                controller: tabController,
+                children: const [tab1(), tab2()],
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -16,49 +16,60 @@ class login_signup extends StatelessWidget {
           height: 200,
         ),
         Container(
-          height: MediaQuery.of(context).size.height * 0.2,
-          width: MediaQuery.of(context).size.height * 01,
-          decoration: const BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage("images/logo-green.png"),
-                  filterQuality: FilterQuality.high)),
+          height: MediaQuery.of(context).size.height * 0.15,
+          width: MediaQuery.of(context).size.height * 0.1,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(
+                "assets/Vector (1).png",
+                width: MediaQuery.of(context).size.width * 0.2,
+                fit: BoxFit.cover,
+              ),
+              Image.asset(
+                "assets/Content.png",
+                width: MediaQuery.of(context).size.width * 0.2,
+                fit: BoxFit.cover,
+              ),
+            ],
+          ),
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              "Lets get Started!",
+              "C'est parti !",
               style: GoogleFonts.poppins(
                   fontSize: 22.sp,
-                  color: Color.fromARGB(211, 14, 13, 13),
+                  color: const Color.fromARGB(211, 14, 13, 13),
                   fontWeight: FontWeight.w700,
                   letterSpacing: 1),
             ),
           ],
         ),
-        SizedBox(
-          height: 5,
+        const SizedBox(
+          height: 10,
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Expanded(
               child: Text(
-                "Login to enjoy the features we've \nprovided, and stay healthy",
+                "Connectez-vous pour profiter des \nfonctionnalités que nous avons \nfournies et rester en bonne santé!",
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(
                     fontSize: 15.sp,
-                    color: Color.fromARGB(211, 14, 13, 13),
+                    color: const Color.fromARGB(211, 14, 13, 13),
                     fontWeight: FontWeight.w400,
                     letterSpacing: 1),
               ),
             ),
           ],
         ),
-        SizedBox(
-          height: 50,
+        const SizedBox(
+          height: 40,
         ),
-        Container(
+        SizedBox(
           height: MediaQuery.of(context).size.height * 0.06,
           width: MediaQuery.of(context).size.width * 0.7,
           child: ElevatedButton(
@@ -66,27 +77,32 @@ class login_signup extends StatelessWidget {
               Navigator.pushReplacement(
                   context,
                   PageTransition(
-                      type: PageTransitionType.rightToLeft, child: login()));
+                    type: PageTransitionType.rightToLeftWithFade, // Adds smooth fade + slide effect
+                    duration: const Duration(milliseconds: 800), // Adjust duration for smoothness
+                    curve: Curves.easeInOut, // Smooth transition
+                    child: const Login(),
+                  )
+              );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color.fromARGB(255, 3, 190, 150),
+              backgroundColor: const Color.fromARGB(255, 3, 190, 150),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(30),
               ),
             ),
             child: Text(
-              "Login",
+              "Se connecter",
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
                 fontSize: 18.sp,
-                color: Color.fromARGB(255, 255, 255, 255),
+                color: const Color.fromARGB(255, 255, 255, 255),
                 fontWeight: FontWeight.w500,
                 letterSpacing: 0,
               ),
             ),
           ),
         ),
-        SizedBox(
+        const SizedBox(
           height: 20,
         ),
         Container(
@@ -100,20 +116,23 @@ class login_signup extends StatelessWidget {
               Navigator.pushReplacement(
                   context,
                   PageTransition(
-                      type: PageTransitionType.rightToLeft, child: register()));
+                      type: PageTransitionType.rightToLeftWithFade, // Adds smooth fade + slide effect
+                      duration: const Duration(milliseconds: 800), // Adjust duration for smoothness
+                      curve: Curves.easeInOut, // Smooth transition
+                      child: const Register()));
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color.fromARGB(255, 255, 255, 255),
+              backgroundColor: const Color.fromARGB(255, 255, 255, 255),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(30),
               ),
             ),
             child: Text(
-              "Sign up",
+              "S'inscrire",
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
                 fontSize: 18.sp,
-                color: Color.fromARGB(255, 3, 190, 150),
+                color: const Color.fromARGB(255, 3, 190, 150),
                 fontWeight: FontWeight.w500,
                 letterSpacing: 0,
               ),

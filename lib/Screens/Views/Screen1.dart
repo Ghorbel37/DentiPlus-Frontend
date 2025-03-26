@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:denti_plus/Screens/On_Board/on_boarding.dart';
 
@@ -13,34 +12,37 @@ class Screen1 extends StatefulWidget {
 class _Screen1State extends State<Screen1> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
-    Timer(Duration(seconds: 3), () {
+    Timer(const Duration(seconds: 3), () {
       Navigator.pushReplacement(context,
           MaterialPageRoute(builder: (BuildContext context) {
-        return on_boarding();
-      }));
+            return on_boarding();
+          }));
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 1, 77, 60),
-      body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
+      backgroundColor: const Color.fromARGB(255, 1, 77, 60),
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min, // Ensures the column wraps content tightly
           children: [
-            Container(
-              height: MediaQuery.of(context).size.height * 0.2,
-              width: MediaQuery.of(context).size.height * 01,
-              decoration: const BoxDecoration(
-                  image: DecorationImage(
-                image: AssetImage("images/logo.png"),
-              )),
-            )
-          ]),
+            Image.asset(
+              "assets/Vector.png",
+              width: MediaQuery.of(context).size.width * 0.3,
+              fit: BoxFit.cover,
+            ),
+            Image.asset(
+              "assets/Content1.png",
+              width: MediaQuery.of(context).size.width * 0.3,
+              fit: BoxFit.cover,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

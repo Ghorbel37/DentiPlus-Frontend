@@ -32,13 +32,13 @@ class _on_boardingState extends State<on_boarding> {
                 onLastpage = (index == 2);
               });
             },
-            children: [
+            children: const [
               on_board1(),
               on_board2(),
               on_board3(),
             ]),
         Container(
-          alignment: Alignment(-0.6, 0.75),
+          alignment: const Alignment(-0.6, 0.75),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -47,20 +47,20 @@ class _on_boardingState extends State<on_boarding> {
                     _controller.jumpToPage(2);
                   },
                   child: Text(
-                    "Skip",
+                    "Passer",
                     style: GoogleFonts.inter(fontSize: 15, color: Colors.grey),
                   )),
               SmoothPageIndicator(
                 controller: _controller,
                 count: 3,
-                effect: SlideEffect(
+                effect: const SlideEffect(
                     spacing: 4.0,
                     radius: 4.0,
                     dotWidth: 14.0,
                     dotHeight: 7.0,
                     strokeWidth: 1.5,
                     dotColor: Color.fromARGB(255, 170, 255, 237),
-                    activeDotColor: const Color.fromARGB(255, 3, 190, 150)),
+                    activeDotColor: Color.fromARGB(255, 3, 190, 150)),
               ),
               onLastpage
                   ? GestureDetector(
@@ -68,8 +68,10 @@ class _on_boardingState extends State<on_boarding> {
                         Navigator.push(
                             context,
                             PageTransition(
-                                type: PageTransitionType.bottomToTop,
-                                child: login_signup()));
+                                type: PageTransitionType.bottomToTop, // Adds smooth fade + slide effect
+                                duration: Duration(milliseconds: 800), // Adjust duration for smoothness
+                                curve: Curves.easeInOut, // Smooth transition
+                                child: const login_signup()));
                       },
                       child: Container(
                         height: MediaQuery.of(context).size.height * 0.05,
@@ -82,7 +84,7 @@ class _on_boardingState extends State<on_boarding> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                "Done ",
+                                "Fait ",
                                 style: GoogleFonts.inter(
                                     fontSize: 16.sp,
                                     fontWeight: FontWeight.bold,
@@ -102,8 +104,8 @@ class _on_boardingState extends State<on_boarding> {
                   : GestureDetector(
                       onTap: () {
                         _controller.nextPage(
-                            duration: Duration(milliseconds: 300),
-                            curve: Curves.easeIn);
+                            duration: const Duration(milliseconds: 800),
+                            curve: Curves.easeInOut);
                       },
                       child: Container(
                         height: MediaQuery.of(context).size.height * 0.05,
@@ -116,14 +118,14 @@ class _on_boardingState extends State<on_boarding> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                "Next ",
+                                "Suivant",
                                 style: GoogleFonts.inter(
                                     fontSize: 16.sp,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
                                     letterSpacing: 1),
                               ),
-                              Container(
+                              SizedBox(
                                 height:
                                     MediaQuery.of(context).size.height * 0.06,
                                 width: MediaQuery.of(context).size.width * 0.06,

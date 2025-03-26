@@ -1,216 +1,150 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
-class verification_code extends StatelessWidget {
-  const verification_code({super.key});
+import 'forgot_pass.dart';
+
+class VerificationCode extends StatelessWidget {
+  const VerificationCode({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus(); // Ferme le clavier
+      },
+      child: Scaffold(
         backgroundColor: Colors.white,
-        toolbarHeight: 80,
-        elevation: 0,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 25),
-        child: Column(children: [
-          SizedBox(
-            height: 40,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(
-                "Forgot your password?",
-                style: GoogleFonts.poppins(
-                  fontSize: 20.sp,
-                  fontWeight: FontWeight.w600,
-                ),
-              )
-            ],
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(
-                "Enter verification code we have sent to your\nnumber",
-                style: GoogleFonts.poppins(
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.black54),
-              ),
-            ],
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                height: MediaQuery.of(context).size.height * 0.06,
-                width: MediaQuery.of(context).size.width * 0.1,
-                decoration: BoxDecoration(
-                  color: Color.fromARGB(241, 245, 245, 245),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.black12),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: 8.0), // Adjust horizontal padding as desired
-                  child: TextField(
-                    keyboardType: TextInputType.number,
-                    textAlign: TextAlign.center,
-
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(borderSide: BorderSide.none),
-                      counterText: '', // Set counterText to an empty string
-                      contentPadding:
-                          EdgeInsets.zero, // Set contentPadding to zero
-                    ),
-                    maxLength: 1,
-                    style: TextStyle(
-                        fontSize: 20.sp), // Adjust font size as desired
-                  ),
-                ),
-              ),
-              Container(
-                height: MediaQuery.of(context).size.height * 0.06,
-                width: MediaQuery.of(context).size.width * 0.1,
-                decoration: BoxDecoration(
-                  color: Color.fromARGB(241, 245, 245, 245),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.black12),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: 8.0), // Adjust horizontal padding as desired
-                  child: TextField(
-                    keyboardType: TextInputType.number,
-                    textAlign: TextAlign.center,
-
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(borderSide: BorderSide.none),
-                      counterText: '', // Set counterText to an empty string
-                      contentPadding:
-                          EdgeInsets.zero, // Set contentPadding to zero
-                    ),
-                    maxLength: 1,
-                    style: TextStyle(
-                        fontSize: 20.sp), // Adjust font size as desired
-                  ),
-                ),
-              ),
-              Container(
-                height: MediaQuery.of(context).size.height * 0.06,
-                width: MediaQuery.of(context).size.width * 0.1,
-                decoration: BoxDecoration(
-                  color: Color.fromARGB(241, 245, 245, 245),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.black12),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: 8.0), // Adjust horizontal padding as desired
-                  child: TextField(
-                    textAlign: TextAlign.center,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(borderSide: BorderSide.none),
-                      counterText: '', // Set counterText to an empty string
-                      contentPadding:
-                          EdgeInsets.zero, // Set contentPadding to zero
-                    ),
-                    maxLength: 1,
-                    style: TextStyle(
-                        fontSize: 20.sp), // Adjust font size as desired
-                  ),
-                ),
-              ),
-              Container(
-                height: MediaQuery.of(context).size.height * 0.06,
-                width: MediaQuery.of(context).size.width * 0.1,
-                decoration: BoxDecoration(
-                  color: Color.fromARGB(241, 245, 245, 245),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.black12),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: 8.0), // Adjust horizontal padding as desired
-                  child: TextField(
-                    textAlign: TextAlign.center,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(borderSide: BorderSide.none),
-                      counterText: '', // Set counterText to an empty string
-                      contentPadding:
-                          EdgeInsets.zero, // Set contentPadding to zero
-                    ),
-                    maxLength: 1,
-                    style: TextStyle(
-                        fontSize: 20.sp), // Adjust font size as desired
-                  ),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(
-            height: 40,
-          ),
-          Container(
-            height: MediaQuery.of(context).size.height * 0.05,
-            width: MediaQuery.of(context).size.width * 0.9,
-            child: ElevatedButton(
-              onPressed: () {
-                // Perform verification or other actions here
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color.fromARGB(255, 3, 190, 150),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-              ),
-              child: Text(
-                "Verify",
-                textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(
-                  fontSize: 18.sp,
-                  color: Color.fromARGB(255, 255, 255, 255),
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: 0,
-                ),
-              ),
+        appBar: AppBar(
+          leading: IconButton(
+            icon: Container(
+              height: MediaQuery.of(context).size.height * 0.06,
+              width: MediaQuery.of(context).size.width * 0.06,
+              child: Image.asset("lib/icons/back2.png"),
             ),
+            onPressed: () {
+              Navigator.pop(
+                context
+              );
+            },
           ),
-          SizedBox(
-            height: 30,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          backgroundColor: Colors.white,
+          toolbarHeight: 80,
+          elevation: 0,
+        ),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 25),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              SizedBox(height: 40),
               Text(
-                "Don't recieve code yet? ",
-                style:
-                    GoogleFonts.poppins(fontSize: 15.sp, color: Colors.black87),
-              ),
-              Text(
-                "Resend",
+                "Code de vérification",
                 style: GoogleFonts.poppins(
-                  fontSize: 15.sp,
-                  color: const Color.fromARGB(255, 3, 190, 150),
+                  fontSize: 22.sp,
                   fontWeight: FontWeight.w600,
                 ),
               ),
+              SizedBox(height: 10),
+              Text(
+                "Entrez le code que nous avons envoyé à votre numéro.",
+                style: GoogleFonts.poppins(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.black54,
+                ),
+              ),
+              SizedBox(height: 30),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: List.generate(4, (index) => _buildCodeField(context)),
+              ),
+              SizedBox(height: 40),
+              SizedBox(
+                width: double.infinity,
+                height: MediaQuery.of(context).size.height * 0.06,
+                child: ElevatedButton(
+                  onPressed: () {
+                    // Vérification du code
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFF03BE96),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 5,
+                  ),
+                  child: Text(
+                    "Vérifier",
+                    style: GoogleFonts.poppins(
+                      fontSize: 18.sp,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 30),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Vous n'avez pas reçu le code? ",
+                    style: GoogleFonts.poppins(
+                      fontSize: 15.sp,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      // Action de renvoi du code
+                    },
+                    child: Text(
+                      "Renvoyer",
+                      style: GoogleFonts.poppins(
+                        fontSize: 15.sp,
+                        color: Color(0xFF03BE96),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
-        ]),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCodeField(BuildContext context) {
+    return Container(
+      height: 55,
+      width: 55,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.black26),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 5,
+            offset: Offset(2, 2),
+          ),
+        ],
+      ),
+      child: Center(
+        child: TextField(
+          keyboardType: TextInputType.number,
+          textAlign: TextAlign.center,
+          decoration: InputDecoration(
+            border: InputBorder.none,
+            counterText: '',
+          ),
+          maxLength: 1,
+          style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }

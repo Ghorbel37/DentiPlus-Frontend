@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+
+import '../../Login-Signup/verification_code.dart';
 
 class tab2 extends StatelessWidget {
   const tab2({super.key});
@@ -10,8 +13,8 @@ class tab2 extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(children: [
-        SizedBox(
-          height: 40,
+        const SizedBox(
+          height: 30,
         ),
         Center(
           child: Container(
@@ -32,11 +35,11 @@ class tab2 extends StatelessWidget {
                       horizontal: 10,
                     ),
                     child: Container(
-                      child: Image.asset("lib/icons/lock.png"),
+                      child: Image.asset("assets/Call.png"),
                     ),
                   ),
                   prefixIconColor: const Color.fromARGB(255, 3, 190, 150),
-                  label: Text("Enter your password"),
+                  label: Text("Entrer votre numéro"),
                   floatingLabelBehavior: FloatingLabelBehavior.never,
                   border: OutlineInputBorder(
                     borderSide: BorderSide.none,
@@ -50,7 +53,17 @@ class tab2 extends StatelessWidget {
           width: MediaQuery.of(context).size.width * 01,
           child: ElevatedButton(
             onPressed: () {
-              // Perform verification or other actions here
+              Navigator.push(
+                context,
+                PageTransition(
+                  type: PageTransitionType.leftToRightWithFade,
+                  // Adds smooth fade + slide effect
+                  duration: const Duration(milliseconds: 800),
+                  // Adjust duration for smoothness
+                  curve: Curves.easeInOut,
+                  child: VerificationCode(),
+                ),
+              );
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Color.fromARGB(255, 3, 190, 150),
@@ -59,10 +72,10 @@ class tab2 extends StatelessWidget {
               ),
             ),
             child: Text(
-              "Reset Password",
+              "Réinitialiser le mot de passe",
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
-                fontSize: 18.sp,
+                fontSize: 16.sp,
                 color: Color.fromARGB(255, 255, 255, 255),
                 fontWeight: FontWeight.w500,
                 letterSpacing: 0,

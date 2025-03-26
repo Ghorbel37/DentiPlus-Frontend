@@ -16,7 +16,7 @@ class on_board2 extends StatelessWidget {
         Container(
           height: MediaQuery.of(context).size.height * 0.6,
           width: MediaQuery.of(context).size.width * 0.8,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
               image: DecorationImage(
                   alignment: Alignment.bottomCenter,
                   image: AssetImage(
@@ -34,19 +34,19 @@ class on_board2 extends StatelessWidget {
                 width: MediaQuery.of(context).size.width * 0.8,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
-                  gradient: LinearGradient(
+                  gradient: const LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
                       Color.fromARGB(255, 247, 247, 247),
-                      const Color.fromARGB(255, 255, 255, 255),
+                      Color.fromARGB(255, 255, 255, 255),
                     ],
                   ),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(25),
                   child: Text(
-                    "Find a lot of specialist\ndoctors in one place",
+                    "Précision, organisation, et \nexcellence au bout des \ndoigts !",
                     style: GoogleFonts.inter(
                         fontSize: 18.sp,
                         fontWeight: FontWeight.bold,

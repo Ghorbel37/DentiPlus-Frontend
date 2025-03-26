@@ -30,6 +30,7 @@ dev_dependencies:
 
 flutter:
   assets:
+    - assets/
     - images/logo.png
     - images/logo-green.png
     - images/google.png
