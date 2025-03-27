@@ -124,7 +124,7 @@ class Dashboard extends StatelessWidget {
           SizedBox(
             height: 10,
           ),
-          const banner(),
+          const BannerWidget(),
           // Banner Design
           const SizedBox(
             height: 20,

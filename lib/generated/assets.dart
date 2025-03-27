@@ -2,12 +2,17 @@
 class Assets {
   Assets._();
 
+  static const String assetsBarbell = 'assets/Barbell.png';
   static const String assetsCall = 'assets/Call.png';
+  static const String assetsCategory = 'assets/Category.png';
   static const String assetsContent = 'assets/Content.png';
   static const String assetsContent1 = 'assets/Content1.png';
   static const String assetsDone24px = 'assets/done_24px.png';
   static const String assetsEyeSlash = 'assets/EyeSlash.png';
   static const String assetsEyeSlashON = 'assets/EyeSlashON.png';
+  static const String assetsFire = 'assets/Fire.png';
+  static const String assetsHeartbeat = 'assets/Heartbeat.png';
+  static const String assetsImageBack = 'assets/imageBack.png';
   static const String assetsVector = 'assets/Vector.png';
   static const String assetsVector1 = 'assets/Vector1.png';
   static const String generatedAssets = 'lib/generated/assets.dart';
@@ -93,10 +98,12 @@ class Assets {
   static const String viewsAppointment = 'lib/Screens/Views/appointment.dart';
   static const String viewsArticlePage = 'lib/Screens/Views/articlePage.dart';
   static const String viewsChatScreen = 'lib/Screens/Views/chat_screen.dart';
+  static const String viewsConsultationScreen = 'lib/Screens/Views/ConsultationScreen.dart';
   static const String viewsDashboardScreen = 'lib/Screens/Views/Dashboard_screen.dart';
   static const String viewsDoctorDetailsScreen = 'lib/Screens/Views/doctor_details_screen.dart';
   static const String viewsDoctorSearch = 'lib/Screens/Views/doctor_search.dart';
   static const String viewsFindDoctor = 'lib/Screens/Views/find_doctor.dart';
+  static const String viewsHomePageDenti = 'lib/Screens/Views/HomePageDenti.dart';
   static const String viewsHomepage = 'lib/Screens/Views/Homepage.dart';
   static const String viewsMessageScreen = 'lib/Screens/Views/message_Screen.dart';
   static const String viewsScreen1 = 'lib/Screens/Views/Screen1.dart';
@@ -108,6 +115,7 @@ class Assets {
   static const String widgetsBanner = 'lib/Screens/Widgets/banner.dart';
   static const String widgetsChatDoctor = 'lib/Screens/Widgets/chat_doctor.dart';
   static const String widgetsChatInfo = 'lib/Screens/Widgets/chat_info.dart';
+  static const String widgetsConsultationCard = 'lib/Screens/Widgets/consultationCard.dart';
   static const String widgetsDateSelect = 'lib/Screens/Widgets/date_select.dart';
   static const String widgetsDoctorList = 'lib/Screens/Widgets/doctorList.dart';
   static const String widgetsListDoctor1 = 'lib/Screens/Widgets/list_doctor1.dart';
