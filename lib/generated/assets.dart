@@ -6,7 +6,10 @@ class Assets {
   static const String assetsContent = 'assets/Content.png';
   static const String assetsContent1 = 'assets/Content1.png';
   static const String assetsDone24px = 'assets/done_24px.png';
+  static const String assetsEyeSlash = 'assets/EyeSlash.png';
+  static const String assetsEyeSlashON = 'assets/EyeSlashON.png';
   static const String assetsVector = 'assets/Vector.png';
+  static const String assetsVector1 = 'assets/Vector1.png';
   static const String generatedAssets = 'lib/generated/assets.dart';
   static const String iconsAmbulance = 'lib/icons/Ambulance.png';
   static const String iconsAppoint = 'lib/icons/appoint.png';
