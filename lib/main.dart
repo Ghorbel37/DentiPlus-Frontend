@@ -23,6 +23,9 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:denti_plus/Screens/Views/find_doctor.dart';
 import 'package:denti_plus/Screens/Views/doctor_details_screen.dart';
 
+import 'Screens/Views/HomePageDenti.dart';
+import 'Screens/Widgets/chat_doctor.dart';
+
 
 void main() {
   runApp(const DentiPlus());
@@ -36,7 +39,7 @@ class DentiPlus extends StatelessWidget {
     return ResponsiveSizer(builder: (context, orientation, screenType) {
       return MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: Screen1(),
+        home: Homepage(),
       );
     });
   }
