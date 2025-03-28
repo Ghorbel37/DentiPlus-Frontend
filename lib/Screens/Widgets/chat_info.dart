@@ -20,14 +20,14 @@ class chat_info extends StatelessWidget {
         ),
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           Text(
-            "Consultion Start",
+            "Consultion 1",
             style: GoogleFonts.poppins(
                 fontSize: 16.sp,
                 fontWeight: FontWeight.w500,
                 color: Color.fromARGB(255, 0, 131, 113)),
           ),
           Text(
-            "You can consult your problem to the doctor",
+            "Votre assistant pour votre protection",
             style: GoogleFonts.poppins(
                 fontSize: 12.sp,
                 fontWeight: FontWeight.w500,

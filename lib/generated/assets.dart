@@ -5,6 +5,7 @@ class Assets {
   static const String assetsBarbell = 'assets/Barbell.png';
   static const String assetsCall = 'assets/Call.png';
   static const String assetsCategory = 'assets/Category.png';
+  static const String assetsChat = 'assets/Chat.png';
   static const String assetsContent = 'assets/Content.png';
   static const String assetsContent1 = 'assets/Content1.png';
   static const String assetsDone24px = 'assets/done_24px.png';
@@ -106,6 +107,7 @@ class Assets {
   static const String viewsHomePageDenti = 'lib/Screens/Views/HomePageDenti.dart';
   static const String viewsHomepage = 'lib/Screens/Views/Homepage.dart';
   static const String viewsMessageScreen = 'lib/Screens/Views/message_Screen.dart';
+  static const String viewsRendezVous = 'lib/Screens/Views/rendezVous.dart';
   static const String viewsScreen1 = 'lib/Screens/Views/Screen1.dart';
   static const String viewsSheduleTab1 = 'lib/Screens/Views/shedule_tab1.dart';
   static const String viewsSheduleTab2 = 'lib/Screens/Views/shedule_tab2.dart';

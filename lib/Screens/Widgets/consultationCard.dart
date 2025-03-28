@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:page_transition/page_transition.dart';
+
+import '../Views/chat_screen.dart'; // Assurez-vous d'importer votre écran de chat
 
 class ConsultationCard extends StatelessWidget {
   final String date;
@@ -9,27 +12,33 @@ class ConsultationCard extends StatelessWidget {
 
   const ConsultationCard({super.key, required this.date, required this.time, required this.title});
 
-
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Container(
-        height: MediaQuery.of(context).size.height * 0.10,
-        width: MediaQuery.of(context).size.width * 0.9,
-        decoration: BoxDecoration(
-          color: Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.black12),
-        ),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            PageTransition(type: PageTransitionType.fade, child: const ChatScreen()),
+          );
+        },
+        child: Container(
+          height: MediaQuery.of(context).size.height * 0.10,
+          width: MediaQuery.of(context).size.width * 0.9,
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.black12),
+          ),
           child: Row(
             children: [
               /// ✅ **Barre latérale verte**
               Container(
                 width: 8.0,
                 height: double.infinity,
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 3, 190, 150),
-                  borderRadius: const BorderRadius.only(
+                decoration: const BoxDecoration(
+                  color: Color.fromARGB(255, 3, 190, 150),
+                  borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(12.0),
                     bottomLeft: Radius.circular(12.0),
                   ),
@@ -70,7 +79,7 @@ class ConsultationCard extends StatelessWidget {
                         Text(
                           date,
                           style: GoogleFonts.poppins(
-                              fontSize: 12.sp,
+                              fontSize: 14.sp,
                               fontWeight: FontWeight.w600,
                               color: const Color.fromARGB(255, 99, 99, 99)),
                         ),
@@ -87,7 +96,7 @@ class ConsultationCard extends StatelessWidget {
                         Text(
                           time,
                           style: GoogleFonts.poppins(
-                              fontSize: 12.sp,
+                              fontSize: 14.sp,
                               fontWeight: FontWeight.w600,
                               color: const Color.fromARGB(255, 99, 99, 99)),
                         ),
@@ -99,6 +108,7 @@ class ConsultationCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
     );
   }
 }

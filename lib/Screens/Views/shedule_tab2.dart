@@ -12,7 +12,7 @@ class shedule_tab2 extends StatelessWidget {
       body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         Center(
           child: Text(
-            "Nothing to show",
+            "Rien à montrer",
             style: GoogleFonts.poppins(
                 fontSize: 20.sp,
                 fontWeight: FontWeight.bold,

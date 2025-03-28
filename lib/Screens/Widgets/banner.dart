@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../Views/chat_screen.dart';
+
 class BannerWidget extends StatelessWidget {
   const BannerWidget({super.key});
 
@@ -34,7 +36,15 @@ class BannerWidget extends StatelessWidget {
                   ),
                   SizedBox(height: 1.5.h),
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      // Navigate to the conversation screen or start a new chat
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChatScreen(), // Replace with your actual chat screen
+                        ),
+                      );
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF048A6D),
                       shape: RoundedRectangleBorder(

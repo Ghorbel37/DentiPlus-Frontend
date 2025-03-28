@@ -5,8 +5,9 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 class date_Select extends StatefulWidget {
   final String maintext;
   final String date;
+  final Function(String) onSelect;
 
-  date_Select({required this.date, required this.maintext});
+  date_Select({required this.date, required this.maintext, required this.onSelect});
 
   @override
   _date_SelectState createState() => _date_SelectState();
@@ -19,6 +20,7 @@ class _date_SelectState extends State<date_Select> {
     setState(() {
       isSelected = !isSelected;
     });
+    widget.onSelect(widget.date);
   }
 
   @override

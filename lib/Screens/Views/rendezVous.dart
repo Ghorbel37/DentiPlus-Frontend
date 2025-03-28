@@ -10,17 +10,19 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../Widgets/consultationCard.dart';
 import 'chat_screen.dart';
+import 'doctor_details_screen.dart';
 
-class Consultationscreen extends StatefulWidget {
-  const Consultationscreen({Key? key}) : super(key: key);
+class Rendezvous extends StatefulWidget {
+  const Rendezvous({Key? key}) : super(key: key);
 
   @override
   _TabBarExampleState createState() => _TabBarExampleState();
 }
 
-class _TabBarExampleState extends State<Consultationscreen>
+class _TabBarExampleState extends State<Rendezvous>
     with SingleTickerProviderStateMixin {
   late TabController tabController;
+
   // Liste de données pour les cartes de consultation
   final List<Map<String, String>> consultationData = [
     {'date': '26/06/2022', 'time': '10:30 AM', 'title': 'Consultation 3'},
@@ -29,6 +31,7 @@ class _TabBarExampleState extends State<Consultationscreen>
     {'date': '28/06/2022', 'time': '12:00 PM', 'title': 'Consultation 5'},
     {'date': '28/06/2022', 'time': '12:00 PM', 'title': 'Consultation 5'},
   ];
+
   @override
   void initState() {
     super.initState();
@@ -47,9 +50,11 @@ class _TabBarExampleState extends State<Consultationscreen>
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
-          "Liste des Consultations",
+          "Calendrier",
           style: GoogleFonts.poppins(
-              color: Colors.black, fontWeight: FontWeight.w700, fontSize: 20.sp),
+              color: Colors.black,
+              fontWeight: FontWeight.w700,
+              fontSize: 20.sp),
         ),
         centerTitle: false,
         elevation: 0,
@@ -58,11 +63,11 @@ class _TabBarExampleState extends State<Consultationscreen>
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Container(
-              height: 20,
-              width: 20,
+              height: 25,
+              width: 25,
               decoration: const BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage("lib/icons/search.png"),
+                  image: AssetImage("assets/Notification.png"),
                 ),
               ),
             ),
@@ -110,7 +115,8 @@ class _TabBarExampleState extends State<Consultationscreen>
                                 child: TabBar(
                                   controller: tabController,
                                   indicator: BoxDecoration(
-                                    color: const Color.fromARGB(255, 3, 190, 150),
+                                    color:
+                                        const Color.fromARGB(255, 3, 190, 150),
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   indicatorSize: TabBarIndicatorSize.tab,
@@ -118,13 +124,17 @@ class _TabBarExampleState extends State<Consultationscreen>
                                   unselectedLabelColor: Colors.black54,
                                   labelColor: Colors.white,
                                   labelStyle: TextStyle(
-                                      fontSize: 16.sp, fontWeight: FontWeight.w500),
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.w500),
                                   tabs: const [
                                     Expanded(
-                                      child: Tab(text: "Encore"),
+                                      child: Tab(text: "Prochain"),
                                     ),
                                     Expanded(
-                                      child: Tab(text: "Validé"),
+                                      child: Tab(text: "Complété"),
+                                    ),
+                                    Expanded(
+                                      child: Tab(text: "Annulé"),
                                     ),
                                   ],
                                 ),
@@ -136,22 +146,13 @@ class _TabBarExampleState extends State<Consultationscreen>
                     ),
                     const SizedBox(height: 20),
                     Expanded(
-                      child: TabBarView(
-                        controller: tabController,
-                        children: [
-                          ListView(
-                            children: consultationData.map((data) {
-                              return ConsultationCard(
-                                date: data['date']!,
-                                time: data['time']!,
-                                title: data['title']!,
-                              );
-                            }).toList(),
-                          ),
+                        child: TabBarView(
+                            controller: tabController,
+                            children: const [
+                          shedule_tab1(),
                           shedule_tab2(),
-                        ],
-                      ),
-                    ),
+                          shedule_tab2(),
+                        ]))
                   ],
                 ),
               ),
@@ -165,23 +166,15 @@ class _TabBarExampleState extends State<Consultationscreen>
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ChatScreen(), // Replace with your actual chat screen
+              builder: (context) =>
+                  DoctorDetails(), // Replace with your actual chat screen
             ),
           );
         },
-        backgroundColor: const Color.fromARGB(255, 3, 190, 150),
-        child: Container(
-          height: 20,
-          width: 20,
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage("assets/Chat.png"),
-            ),
-          ),
-        ),
+        backgroundColor: const Color.fromARGB(255, 254, 92, 92),
+        child:Icon(Icons.add_box, color: Colors.white),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
-
   }
 }

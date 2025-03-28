@@ -258,12 +258,13 @@ void showSuccessDialog(BuildContext context) {
               ElevatedButton(
                 onPressed: () {
                   Navigator.pop(context); // Ferme la popup
-                  Navigator.pushReplacement(
+                  Navigator.pushAndRemoveUntil(
                     context,
                     PageTransition(
                       type: PageTransitionType.fade,
                       child: Homepage(),
                     ),
+                        (Route<dynamic> route) => false, // Supprime tous les écrans précédents
                   );
                 },
                 style: ElevatedButton.styleFrom(

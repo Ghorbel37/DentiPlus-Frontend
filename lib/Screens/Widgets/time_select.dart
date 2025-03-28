@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 class time_select extends StatefulWidget {
   final String mainText;
+  final Function(String) onSelect;
 
-  time_select({required this.mainText});
+  time_select({required this.mainText, required this.onSelect});
 
   @override
   _time_selectState createState() => _time_selectState();
@@ -16,6 +17,7 @@ class _time_selectState extends State<time_select> {
     setState(() {
       isSelected = !isSelected;
     });
+    widget.onSelect(widget.mainText);
   }
 
   @override

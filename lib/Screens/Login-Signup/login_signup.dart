@@ -22,7 +22,7 @@ class login_signup extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Image.asset(
-                "assets/Vector (1).png",
+                "assets/Vector1.png",
                 width: MediaQuery.of(context).size.width * 0.2,
                 fit: BoxFit.cover,
               ),

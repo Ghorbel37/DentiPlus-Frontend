@@ -53,8 +53,8 @@ class _Auth_text_fieldState extends State<Auth_text_field> {
                 ? IconButton(
                     icon: Image.asset(
                       _obscureText
-                          ? 'assets/Eye SlashON.png' // Use your icon image
-                          : 'assets/Eye Slash.png',
+                          ? 'assets/EyeSlashON.png' // Use your icon image
+                          : 'assets/EyeSlash.png',
                       // Use another icon for "off" state
                       height: 24, // Adjust size as needed
                       width: 24,
