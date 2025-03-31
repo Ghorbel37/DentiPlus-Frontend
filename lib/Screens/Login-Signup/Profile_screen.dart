@@ -1,7 +1,13 @@
+import 'package:denti_plus/Screens/Login-Signup/login.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:denti_plus/Screens/Widgets/profile_list.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:denti_plus/Screens/Login-Signup/register.dart';
+import 'package:denti_plus/Screens/Views/Homepage.dart';
+import 'package:denti_plus/Screens/Login-Signup/SettingsPage.dart';
+import 'package:denti_plus/Screens/Widgets/auth_social_login.dart';
+import 'package:page_transition/page_transition.dart';
 
 class Profile_screen extends StatelessWidget {
   const Profile_screen({super.key});
@@ -9,19 +15,15 @@ class Profile_screen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 3, 226, 215),
+      backgroundColor: Color.fromARGB(255, 5, 185, 155),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            SizedBox(
-              height: 50,
-            ),
+            const SizedBox(height: 150),
             Center(
               child: Stack(
                 children: [
-                  SizedBox(
-                    height: 50,
-                  ),
+                  const SizedBox(height: 100),
                   Container(
                     width: 110,
                     height: 110,
@@ -56,199 +58,215 @@ class Profile_screen extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(
-              height: 30,
+            const SizedBox(height: 30),
+            Text(
+              "Amelia Renata",
+              style: GoogleFonts.poppins(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "Amelia Renata",
-                  style: GoogleFonts.poppins(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white),
-                )
-              ],
-            ),
-            SizedBox(
-              height: 30,
-            ),
+            const SizedBox(height: 30),
+
+            /// 📌 Section avec les infos (Calories, Poids, F cardiaque)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 25),
+              padding: const EdgeInsets.symmetric(horizontal: 50),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                    height: MediaQuery.of(context).size.height * 0.0900,
-                    width: MediaQuery.of(context).size.width * 0.2500,
-                    child: Column(children: [
-                      Container(
-                        height: MediaQuery.of(context).size.height * 0.0400,
-                        width: MediaQuery.of(context).size.width * 0.1500,
-                        decoration: const BoxDecoration(
-                          image: DecorationImage(
-                              image: AssetImage("lib/icons/callories.png"),
-                              filterQuality: FilterQuality.high),
-                        ),
-                      ),
-                      Text(
-                        "Calories",
-                        style: GoogleFonts.poppins(
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.w600,
-                            color: Color.fromARGB(255, 245, 243, 243)),
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Text(
-                        "103lbs",
-                        style: GoogleFonts.poppins(
-                            fontSize: 15.sp,
-                            fontWeight: FontWeight.w600,
-                            color: Color.fromARGB(255, 255, 255, 255)),
-                      )
-                    ]),
-                  ),
-                  Container(
-                    height: 50,
-                    width: 1,
-                    color: Colors.white,
-                  ),
-                  Container(
-                    height: MediaQuery.of(context).size.height * 0.0900,
-                    width: MediaQuery.of(context).size.width * 0.2500,
-                    child: Column(children: [
-                      Container(
-                        height: MediaQuery.of(context).size.height * 0.0400,
-                        width: MediaQuery.of(context).size.width * 0.1500,
-                        decoration: const BoxDecoration(
-                          image: DecorationImage(
-                              image: AssetImage("lib/icons/weight.png"),
-                              filterQuality: FilterQuality.high),
-                        ),
-                      ),
-                      Text(
-                        "Weight",
-                        style: GoogleFonts.poppins(
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.w600,
-                            color: Color.fromARGB(255, 245, 243, 243)),
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Text(
-                        "756cal",
-                        style: GoogleFonts.poppins(
-                            fontSize: 15.sp,
-                            fontWeight: FontWeight.w600,
-                            color: Color.fromARGB(255, 255, 255, 255)),
-                      )
-                    ]),
-                  ),
-                  Container(
-                    height: 50,
-                    width: 1,
-                    color: Colors.white,
-                  ),
-                  Container(
-                    height: MediaQuery.of(context).size.height * 0.0900,
-                    width: MediaQuery.of(context).size.width * 0.2500,
-                    child: Column(children: [
-                      Container(
-                        height: MediaQuery.of(context).size.height * 0.0400,
-                        width: MediaQuery.of(context).size.width * 0.1500,
-                        decoration: const BoxDecoration(
-                          image: DecorationImage(
-                              image: AssetImage("lib/icons/heart.png"),
-                              filterQuality: FilterQuality.high),
-                        ),
-                      ),
-                      Text(
-                        "Heart rate",
-                        style: GoogleFonts.poppins(
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.w600,
-                            color: Color.fromARGB(255, 245, 243, 243)),
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Text(
-                        "215bpm",
-                        style: GoogleFonts.poppins(
-                            fontSize: 15.sp,
-                            fontWeight: FontWeight.w600,
-                            color: Color.fromARGB(255, 255, 255, 255)),
-                      )
-                    ]),
-                  ),
+                  buildProfileStat(
+                      "lib/icons/callories.png", "Calories", "103lbs"),
+                  Container(height: 50, width: 1, color: Colors.white),
+                  buildProfileStat("lib/icons/weight.png", "Poids", "756cal"),
+                  Container(height: 50, width: 1, color: Colors.white),
+                  buildProfileStat(
+                      "lib/icons/heart.png", "F cardiaque", "215bpm"),
                 ],
               ),
             ),
-            const SizedBox(
-              height: 50,
-            ),
+
+            const SizedBox(height: 180),
+
+            /// 📌 Section avec les options (Paramètres, Déconnexion)
             Container(
-              height: 550,
+              height: 250,
               width: double.infinity,
               decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(30),
                       topRight: Radius.circular(30))),
-              child: Column(children: [
-                SizedBox(
-                  height: 50,
-                ),
-                profile_list(
-                  image: "lib/icons/heart2.png",
-                  title: "My Saved",
-                  color: Colors.black87,
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-                  child: Divider(),
-                ),
-                profile_list(
-                  image: "lib/icons/appoint.png",
-                  title: "Appointmnet",
-                  color: Colors.black87,
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-                  child: Divider(),
-                ),
-                profile_list(
-                  image: "lib/icons/chat.png",
-                  title: "FAQs",
-                  color: Colors.black87,
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-                  child: Divider(),
-                ),
-                profile_list(
-                  image: "lib/icons/pay.png",
-                  title: "Payment Method",
-                  color: Colors.black87,
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-                  child: Divider(),
-                ),
-                profile_list(
-                  image: "lib/icons/logout.png",
-                  title: "Log out",
-                  color: Colors.red,
-                ),
-              ]),
+              child: Column(
+                children: [
+                  const SizedBox(height: 50),
+
+                  /// 🔹 **Paramètres (Redirection vers une autre page)**
+                  profile_list(
+                    image: "lib/icons/pay.png",
+                    title: "Paramètres",
+                    color: Colors.black87,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => SettingsPage()), // Remplace par ta page
+                      );
+                    },
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+                    child: Divider(),
+                  ),
+
+                  /// 🔹 **Déconnexion (Affiche une boîte de dialogue)**
+                  profile_list(
+                    image: "lib/icons/logout.png",
+                    title: "Déconnexion",
+                    color: Colors.red,
+                    onTap: () {
+                      showLogoutDialog(context);
+                    },
+                  ),
+                ],
+              ),
             ),
           ],
         ),
       ),
     );
   }
+
+  /// 📌 Widget pour afficher les statistiques (Calories, Poids, etc.)
+  Widget buildProfileStat(String iconPath, String label, String value) {
+    return Column(
+      children: [
+        Container(
+          height: 40,
+          width: 40,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+                image: AssetImage(iconPath), filterQuality: FilterQuality.high),
+          ),
+        ),
+        Text(
+          label,
+          style: GoogleFonts.poppins(
+              fontSize: 13.sp,
+              fontWeight: FontWeight.w600,
+              color: Colors.white),
+        ),
+        const SizedBox(height: 5),
+        Text(
+          value,
+          style: GoogleFonts.poppins(
+              fontSize: 15.sp,
+              fontWeight: FontWeight.w600,
+              color: Colors.white),
+        ),
+      ],
+    );
+  }
 }
+
+/// 📌 Fonction pour afficher la boîte de dialogue de déconnexion
+void showLogoutDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            // Centrer tout le contenu
+            children: [
+              // ✅ Icône avec effet circulaire
+              Container(
+                padding: EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100], // Fond clair circulaire
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      spreadRadius: 2,
+                      blurRadius: 5,
+                    ),
+                  ],
+                ),
+                child: Image.asset(
+                  'assets/Group_135.png',
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.contain,
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // ✅ Titre
+              const Text(
+                "Êtes-vous sûr de vouloir\nvous déconnecter ?",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 10),
+
+              // ✅ Sous-titre explicatif
+              Text(
+                "Vous pouvez vous reconnecter à tout moment avec vos identifiants Denti+.",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // ✅ Bouton de confirmation amélioré
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context); // Ferme la popup
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      PageTransition(
+                        type: PageTransitionType.fade,
+                        child: Login(),
+                      ),
+                          (Route<dynamic> route) => false, // Supprime tous les écrans précédents
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF03BE96), // Couleur verte
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    minimumSize: Size(double.infinity, 45),
+                  ),
+                  child: const Text(
+                    "Se déconnecter",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
+

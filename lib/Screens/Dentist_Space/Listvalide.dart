@@ -1,3 +1,4 @@
+import 'package:denti_plus/Screens/Dentist_Space/ConsDetails.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -5,12 +6,12 @@ import 'package:page_transition/page_transition.dart';
 
 import '../Views/chat_screen.dart'; // Assurez-vous d'importer votre écran de chat
 
-class ConsultationCard extends StatelessWidget {
+class Listvalide extends StatelessWidget {
   final String date;
   final String time;
   final String title;
 
-  const ConsultationCard(
+  const Listvalide(
       {super.key, required this.date, required this.time, required this.title});
 
   @override
@@ -21,7 +22,7 @@ class ConsultationCard extends StatelessWidget {
           Navigator.push(
             context,
             PageTransition(
-                type: PageTransitionType.fade, child: const ChatScreen()),
+                type: PageTransitionType.fade, child: const Consdetails(showBottomAppBar: false),),
           );
         },
         child: Container(
