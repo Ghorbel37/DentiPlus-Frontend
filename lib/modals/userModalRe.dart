@@ -3,11 +3,11 @@ import 'enums.dart';
 import 'doctorModal.dart';
 import 'patientModal.dart';
 
-class User {
+class UserRe {
   final int? id;
-  final String? address;
+  final String? adress;
   final DateTime? birthdate;
-  final String? username;
+  final String? email;
   final String? name;
   final String? password;
   final String? phoneNumber;
@@ -16,11 +16,11 @@ class User {
   final Doctor? doctor;  // May be null if the user is not a doctor
   final Patient? patient; // May be null if the user is not a patient
 
-  User({
+  UserRe({
     this.id,
-    this.address,
+    this.adress,
     this.birthdate,
-    this.username,
+    this.email,
     this.name,
     this.password,
     this.phoneNumber,
@@ -30,15 +30,15 @@ class User {
     this.patient,
   });
 
-  factory User.fromJson(Map<String, dynamic> json) {
-    return User(
+  factory UserRe.fromJson(Map<String, dynamic> json) {
+    return UserRe(
       id: json['id'] as int?,
       // Note: Check for field name differences here ('adress' vs 'address')
-      address: json['adress'] as String?,
+      adress: json['adress'] as String?,
       birthdate: json['birthdate'] != null
           ? DateTime.parse(json['birthdate'])
           : null,
-      username: json['username'] as String?,
+      email: json['email'] as String?,
       name: json['name'] as String?,
       password: json['password'] as String?,
       phoneNumber: json['phoneNumber'] as String?,
@@ -57,9 +57,9 @@ class User {
     return {
       'id': id,
       // Note: Sending 'adress' as key, matching the backend naming.
-      'adress': address,
+      'adress': adress,
       'birthdate': birthdate?.toIso8601String(),
-      'username': username,
+      'email': email,
       'name': name,
       'password': password,
       'phoneNumber': phoneNumber,
