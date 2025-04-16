@@ -2,12 +2,15 @@ import 'package:denti_plus/Screens/Login-Signup/login.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:denti_plus/Screens/Widgets/profile_list.dart';
+import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:denti_plus/Screens/Login-Signup/register.dart';
 import 'package:denti_plus/Screens/Views/Homepage.dart';
 import 'package:denti_plus/Screens/Login-Signup/SettingsPage.dart';
 import 'package:denti_plus/Screens/Widgets/auth_social_login.dart';
 import 'package:page_transition/page_transition.dart';
+
+import '../../providers/auth_provider.dart';
 
 class Profile_screen extends StatelessWidget {
   const Profile_screen({super.key});
@@ -181,13 +184,12 @@ void showLogoutDialog(BuildContext context) {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
-            // Centrer tout le contenu
             children: [
-              // ✅ Icône avec effet circulaire
+              // Icon with circular effect
               Container(
                 padding: EdgeInsets.all(15),
                 decoration: BoxDecoration(
-                  color: Colors.grey[100], // Fond clair circulaire
+                  color: Colors.grey[100], // Light background
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
@@ -205,8 +207,7 @@ void showLogoutDialog(BuildContext context) {
                 ),
               ),
               const SizedBox(height: 20),
-
-              // ✅ Titre
+              // Title
               const Text(
                 "Êtes-vous sûr de vouloir\nvous déconnecter ?",
                 textAlign: TextAlign.center,
@@ -217,8 +218,7 @@ void showLogoutDialog(BuildContext context) {
                 ),
               ),
               const SizedBox(height: 10),
-
-              // ✅ Sous-titre explicatif
+              // Subtitle
               Text(
                 "Vous pouvez vous reconnecter à tout moment avec vos identifiants Denti+.",
                 textAlign: TextAlign.center,
@@ -228,29 +228,30 @@ void showLogoutDialog(BuildContext context) {
                 ),
               ),
               const SizedBox(height: 20),
-
-              // ✅ Bouton de confirmation amélioré
+              // Logout button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context); // Ferme la popup
+                  onPressed: () async {
+                    // Call logout from the provider
+                    await Provider.of<AuthProvider>(context, listen: false).logout();
+                    Navigator.pop(context); // Close the dialog
                     Navigator.pushAndRemoveUntil(
                       context,
                       PageTransition(
                         type: PageTransitionType.fade,
                         child: Login(),
                       ),
-                          (Route<dynamic> route) => false, // Supprime tous les écrans précédents
+                          (Route<dynamic> route) => false, // Remove all previous screens
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF03BE96), // Couleur verte
+                    backgroundColor: const Color(0xFF03BE96), // Green color
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
-                    padding: EdgeInsets.symmetric(vertical: 12),
-                    minimumSize: Size(double.infinity, 45),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    minimumSize: const Size(double.infinity, 45),
                   ),
                   child: const Text(
                     "Se déconnecter",
@@ -268,5 +269,6 @@ void showLogoutDialog(BuildContext context) {
     },
   );
 }
+
 
 

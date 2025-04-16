@@ -1,6 +1,7 @@
 // lib/models/patient_create.dart
 
 class PatientCreate {
+  final int? id;
   final String? email;
   final String? name;
   final String? adress;       // spelled 'adress' to match your backend
@@ -10,8 +11,10 @@ class PatientCreate {
   final int? frequenceCardiaque;
   final int? poids;
   final String? password;
+  final String? role;
 
   PatientCreate({
+    this.id,
     this.email,
     this.name,
     this.adress,
@@ -21,11 +24,38 @@ class PatientCreate {
     this.frequenceCardiaque,
     this.poids,
     this.password,
+    this.role,
   });
 
+  PatientCreate copyWith({
+    int? id,
+    String? name,
+    String? email,
+    String? role,
+    String? adress,
+    String? birthdate,
+    String? phoneNumber,
+    int? calories,
+    int? frequenceCardiaque,
+    int? poids,
+  }) {
+    return PatientCreate(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      role: role ?? this.role,
+      adress: adress ?? this.adress,
+      birthdate: birthdate ?? this.birthdate,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      calories: calories ?? this.calories,
+      frequenceCardiaque: frequenceCardiaque ?? this.frequenceCardiaque,
+      poids: poids ?? this.poids,
+    );
+  }
   // Convert from JSON
   factory PatientCreate.fromJson(Map<String, dynamic> json) {
     return PatientCreate(
+      id: json['id'] as int?,
       email: json['email'] as String?,
       name: json['name']as String?,
       adress: json['adress']as String?,
@@ -35,12 +65,14 @@ class PatientCreate {
       frequenceCardiaque: json['frequenceCardiaque']as int?,
       poids: json['poids'] as int?,
       password: json['password']as String?,
+      role:  json['role'] as String?,
     );
   }
 
   // Convert to JSON
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'email': email,
       'name': name,
       'adress': adress,
@@ -50,6 +82,7 @@ class PatientCreate {
       'frequenceCardiaque': frequenceCardiaque,
       'poids': poids,
       'password': password,
+      'role' : role,
     };
   }
 }

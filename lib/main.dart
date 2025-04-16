@@ -1,3 +1,4 @@
+import 'package:denti_plus/Screens/Widgets/RootWrapper.dart';
 import 'package:denti_plus/providers/patient_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -12,6 +13,7 @@ import 'package:denti_plus/providers/auth_provider.dart';
 // import 'package:denti_plus/providers/doctor_provider.dart';
 // import 'package:denti_plus/providers/patient_provider.dart';
 
+// lib/main.dart
 void main() {
   runApp(const DentiPlus());
 }
@@ -25,18 +27,39 @@ class DentiPlus extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => PatientProvider()),
-        // Add more providers here as you build them:
-        // ChangeNotifierProvider(create: (_) => DoctorProvider()),
-        // ChangeNotifierProvider(create: (_) => PatientProvider()),
       ],
       child: ResponsiveSizer(
         builder: (context, orientation, screenType) {
-          return const MaterialApp(
+          return MaterialApp(
             debugShowCheckedModeBanner: false,
-            home: Screen1(), // You can replace with Login if needed
+            home: FutureBuilder(
+              future: _initializeApp(context),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  return const RootWrapper();
+                }
+                return const SplashScreen();
+              },
+            ),
           );
         },
       ),
+    );
+  }
+
+  Future<void> _initializeApp(BuildContext context) async {
+    // Initialize auth state
+    await Provider.of<AuthProvider>(context, listen: false).initAuth();
+  }
+}
+
+class SplashScreen extends StatelessWidget {
+  const SplashScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(child: CircularProgressIndicator()),
     );
   }
 }

@@ -6,12 +6,12 @@ import '../services/api_service.dart';
 class PatientProvider extends ChangeNotifier {
   final ApiService _apiService = ApiService();
 
-  Patient? _patient;
+  PatientCreate? _patient;
   bool _isLoading = false;
   String? _errorMessage;
 
   // Getters
-  Patient? get patient => _patient;
+  PatientCreate? get patient => _patient;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
@@ -56,23 +56,6 @@ class PatientProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
-  }
-
-  /// Update an existing patient by ID
-  Future<void> updatePatient(int id, Patient updatedPatient) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
-      final updated = await _apiService.updatePatient(id, updatedPatient);
-      _patient = updated;
-    } catch (e) {
-      _errorMessage = e.toString();
-    }
-
-    _isLoading = false;
-    notifyListeners();
   }
 
   /// Clear all patient data (on logout or reset)

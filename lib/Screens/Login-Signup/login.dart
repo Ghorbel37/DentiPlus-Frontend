@@ -8,7 +8,9 @@ import 'package:denti_plus/Screens/Widgets/Auth_text_field.dart';
 import 'package:denti_plus/Screens/Widgets/auth_social_login.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../Dentist_Space/DentistHome.dart';
 import '../Widgets/auth_text_field_with_controller.dart';
 import 'package:denti_plus/providers/auth_provider.dart'; // ✅ Import
 import 'package:provider/provider.dart';
@@ -238,6 +240,7 @@ class _LoginState extends State<Login> {
 }
 
 void showSuccessDialog(BuildContext context) {
+  final auth = Provider.of<AuthProvider>(context, listen: false); // Access the user role
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -290,16 +293,35 @@ void showSuccessDialog(BuildContext context) {
 
               // ✅ Bouton (ajoute ta couleur)
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   Navigator.pop(context); // Ferme la popup
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    PageTransition(
-                      type: PageTransitionType.fade,
-                      child: Homepage(),
-                    ),
-                        (Route<dynamic> route) => false, // Supprime tous les écrans précédents
-                  );
+                  // Navigate based on user role
+                  final prefs = await SharedPreferences.getInstance();
+                  final role = prefs.getString('role') ?? '';
+                  if (role == "PATIENT") {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      PageTransition(
+                        type: PageTransitionType.fade,
+                        child: Homepage(),
+                      ),
+                          (route) => false,
+                    );
+                  } else if (role == "DOCTOR") {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      PageTransition(
+                        type: PageTransitionType.fade,
+                        child: Dentisthome(),
+                      ),
+                          (route) => false,
+                    );
+                  } else {
+                    // fallback: if role is unknown
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Rôle inconnu. Contactez l'administrateur.")),
+                    );
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF03BE96), // Remplace par ta couleur

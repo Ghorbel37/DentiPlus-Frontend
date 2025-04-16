@@ -22,6 +22,8 @@ dependencies:
   animated_bottom_navigation_bar: ^1.2.0
   provider: any
   path_provider: any
+  shared_preferences: any
+  jwt_decoder: any
 
 dev_dependencies:
   flutter_launcher_icons: ^0.13.1

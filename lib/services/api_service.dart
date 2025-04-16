@@ -3,6 +3,8 @@
 import 'dart:convert';
 import 'package:denti_plus/modals/patientCreateModal.dart';
 import 'package:http/http.dart' as http;
+import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'config.dart';
 
 // Import your model classes here. For example:
@@ -33,6 +35,20 @@ class ApiService {
       },
     );
     if (response.statusCode == 200) {
+      final tokenData = jsonDecode(response.body);
+      final accessToken = tokenData['access_token'];
+
+      // Decode the JWT to get user data
+      final decodedToken = JwtDecoder.decode(accessToken);
+      final userEmail = decodedToken['sub']; // From your token's "sub" claim
+      final userRole = decodedToken['role']; // From your token's "role" claim
+      final userId = decodedToken['id'];
+
+      // Store user data (e.g., in SharedPreferences)
+      await _storeUserData(userEmail, userRole, userId);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('access_token', accessToken);
+
       // You could parse this into a Token model if you have one.
       return jsonDecode(response.body);
     } else {
@@ -41,16 +57,22 @@ class ApiService {
       throw Exception(errorMessage);
     }
   }
+  Future<void> _storeUserData(String email, String role, int id) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('email', email);
+    await prefs.setString('role', role);
+    await prefs.setInt('user_id', id);
+  }
 
   // --------------------
   // USER ENDPOINTS
   // --------------------
 
-  Future<User> fetchUser(int id) async {
+  Future<PatientCreate> fetchUser(int id) async {
     final url = Uri.parse(Config.getUserByIdUrl(id));
     final response = await http.get(url);
     if (response.statusCode == 200) {
-      return User.fromJson(jsonDecode(response.body));
+      return PatientCreate.fromJson(jsonDecode(response.body));
     }
     throw Exception('Failed to load user');
   }
@@ -66,20 +88,36 @@ class ApiService {
   }
 
   Future<Map<String, dynamic>> updatePassword(String currentPassword, String newPassword) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access_token') ?? '';
+
+    // Optional: Debug print the token (remove in production)
+    print("Using token: $token");
+
     final url = Uri.parse(Config.updatePasswordUrl);
     final response = await http.put(
       url,
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
       body: jsonEncode({
         'current_password': currentPassword,
         'new_password': newPassword,
       }),
     );
+
+    // Optional: print response body for debugging
+    print("Response status: ${response.statusCode}");
+    print("Response body: ${response.body}");
+
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     }
     throw Exception('Failed to update password: ${response.body}');
   }
+
+
 
   // --------------------
   // DOCTOR ENDPOINTS
@@ -117,7 +155,7 @@ class ApiService {
     throw Exception('Failed to create doctor: ${response.body}');
   }
 
-  Future<Doctor> updateDoctor(int id, Doctor updatedDoctor) async {
+  Future<PatientCreate> updateDoctor(int id, PatientCreate updatedDoctor) async {
     final url = Uri.parse('${Config.doctorsUrl}/$id');
     final response = await http.put(
       url,
@@ -125,7 +163,7 @@ class ApiService {
       body: jsonEncode(updatedDoctor.toJson()),
     );
     if (response.statusCode == 200) {
-      return Doctor.fromJson(jsonDecode(response.body));
+      return PatientCreate.fromJson(jsonDecode(response.body));
     }
     throw Exception('Failed to update doctor: ${response.body}');
   }
@@ -134,11 +172,11 @@ class ApiService {
   // PATIENT ENDPOINTS
   // --------------------
 
-  Future<Patient> fetchPatient(int id) async {
+  Future<PatientCreate> fetchPatient(int id) async {
     final url = Uri.parse(Config.getPatientByIdUrl(id));
     final response = await http.get(url);
     if (response.statusCode == 200) {
-      return Patient.fromJson(jsonDecode(response.body));
+      return PatientCreate.fromJson(jsonDecode(response.body));
     }
     throw Exception('Failed to load patient');
   }
@@ -157,18 +195,20 @@ class ApiService {
   }
 
 
-  Future<Patient> updatePatient(int id, Patient updatedPatient) async {
-    final url = Uri.parse('${Config.patientsUrl}/$id');
+  Future<PatientCreate> updatePatient(int id, PatientCreate updatedPatient) async {
+    final url = Uri.parse('${Config.patientsUrl}$id');
     final response = await http.put(
       url,
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(updatedPatient.toJson()),
     );
     if (response.statusCode == 200) {
-      return Patient.fromJson(jsonDecode(response.body));
+      return PatientCreate.fromJson(jsonDecode(response.body));
     }
-    throw Exception('Failed to update patient');
+    // Print or include the response body in the exception for debugging.
+    throw Exception('Failed to update patient: ${response.body}');
   }
+
 
   // --------------------
   // CONSULTATION (DOCTOR) ENDPOINTS
