@@ -1,85 +1,77 @@
+import 'package:denti_plus/providers/chat_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:denti_plus/Screens/Views/Homepage.dart';
-import 'package:denti_plus/Screens/Widgets/chat_doctor.dart';
-import 'package:denti_plus/Screens/Widgets/chat_info.dart';
+import 'package:provider/provider.dart';
 
-class ChatScreen extends StatelessWidget {
-  const ChatScreen({super.key});
+import '../../modals/consultationModal.dart';
+import '../../modals/enums.dart';
+import '../../providers/conversation_provider.dart';
+import '../Widgets/chat_info.dart'; // updated name
+import '../Widgets/chat_doctor.dart';
+
+class ChatScreen extends StatefulWidget {
+  final Consultation consultation;
+
+  const ChatScreen({Key? key, required this.consultation}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: _buildAppBar(context),
-      body: Column(
-        children: [
-          Expanded(child: _buildChatMessages()),
-          _buildMessageInputField(),
+  _ChatScreenState createState() => _ChatScreenState();
+}
+
+class _ChatScreenState extends State<ChatScreen> {
+  late TextEditingController _controller;
+  late ChatProvider _chatProvider;
+
+  bool get isConsultationClosed {
+    return widget.consultation.etat == EtatConsultation.VALIDE ||
+        widget.consultation.etat == EtatConsultation.RECONSULTATION;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController();
+    // Grab provider and fetch history
+    _chatProvider = Provider.of<ChatProvider>(context, listen: false);
+    _chatProvider.fetchChatHistory(widget.consultation.id!);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  AppBar _buildAppBar() => AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        toolbarHeight: 100,
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: Image.asset("lib/icons/back1.png", height: 24, width: 24),
+        ),
+        title: Text(
+          "Dr. Marcus Horizon",
+          style: GoogleFonts.poppins(
+            color: Colors.black,
+            fontWeight: FontWeight.w500,
+            fontSize: 17.sp,
+          ),
+        ),
+        actions: [
+          _appBarIcon("lib/icons/video_call.png"),
+          _appBarIcon("lib/icons/call.png"),
+          _appBarIcon("lib/icons/more.png"),
         ],
-      ),
-    );
-  }
+      );
 
-  // AppBar with navigation and icons
-  AppBar _buildAppBar(BuildContext context) {
-    return AppBar(
-      backgroundColor: Colors.white,
-      elevation: 0,
-      toolbarHeight: 100,
-      leading: IconButton(
-        onPressed: () => Navigator.pop(
-          context
-        ),
-        icon: Image.asset("lib/icons/back1.png", height: 24, width: 24),
-      ),
-      title: Text(
-        "Dr. Marcus Horizon",
-        style: GoogleFonts.poppins(
-          color: Colors.black,
-          fontWeight: FontWeight.w500,
-          fontSize: 17.sp,
-        ),
-      ),
-      actions: [
-        _buildAppBarIcon("lib/icons/video_call.png"),
-        _buildAppBarIcon("lib/icons/call.png"),
-        _buildAppBarIcon("lib/icons/more.png"),
-      ],
-    );
-  }
+  Widget _appBarIcon(String path) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: Image.asset(path, height: 24, width: 24),
+      );
 
-  // Function to create AppBar icons
-  Widget _buildAppBarIcon(String assetPath) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: Image.asset(assetPath, height: 24, width: 24),
-    );
-  }
-
-  // Chat Messages ListView
-  Widget _buildChatMessages() {
-    return ListView(
-      padding: const EdgeInsets.all(18),
-      children: [
-        const chat_info(),
-        const SizedBox(height: 20),
-        const chat_doctor(),
-        const SizedBox(height: 15),
-        _buildChatBubble("Hello. How can I help you?", false),
-        const SizedBox(height: 15),
-        _buildChatBubble(
-          "I have been suffering from headache and cold for 3 days. I took 2 tablets of Dolo, but still in pain.",
-          true,
-        ),
-      ],
-    );
-  }
-
-  // Chat Bubble UI
   Widget _buildChatBubble(String message, bool isUser) {
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
@@ -87,7 +79,9 @@ class ChatScreen extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         constraints: BoxConstraints(maxWidth: 70.w),
         decoration: BoxDecoration(
-          color: isUser ? const Color.fromARGB(255, 0, 131, 113) : const Color(0xFFECE8E8),
+          color: isUser
+              ? const Color.fromARGB(255, 0, 131, 113)
+              : const Color(0xFFECE8E8),
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(isUser ? 10 : 0),
             topRight: Radius.circular(isUser ? 0 : 10),
@@ -107,37 +101,118 @@ class ChatScreen extends StatelessWidget {
     );
   }
 
-  // Message Input Field
+  Widget _buildClosedConsultationMessage() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: Text(
+        widget.consultation.etat == EtatConsultation.VALIDE
+            ? "This consultation is validated. No new messages can be sent."
+            : "This consultation requires a follow-up. Please schedule a new consultation.",
+        style: GoogleFonts.poppins(
+          color: Colors.grey,
+          fontStyle: FontStyle.italic,
+          fontSize: 14.sp,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
   Widget _buildMessageInputField() {
     return Padding(
       padding: const EdgeInsets.all(15),
-      child: Row(
+      child: Column(
         children: [
-          Expanded(
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: "Type message ...",
-                filled: true,
-                fillColor: const Color.fromARGB(255, 247, 247, 247),
-                prefixIcon: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Image.asset("lib/icons/pin.png", height: 24, width: 24),
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide.none,
+          if (isConsultationClosed) _buildClosedConsultationMessage(),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _controller,
+                  enabled: !isConsultationClosed,
+                  decoration: InputDecoration(
+                    hintText: "Type message ...",
+                    filled: true,
+                    fillColor: isConsultationClosed
+                        ? Colors.grey[200]
+                        : const Color.fromARGB(255, 247, 247, 247),
+                    prefixIcon: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Image.asset("lib/icons/pin.png",
+                          height: 24, width: 24),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-          const SizedBox(width: 10),
-          IconButton(
-            icon: Icon(FontAwesomeIcons.telegram , color: Colors.teal, size: 40),
-            onPressed: () {
-              // Implement send message function
-            },
+              const SizedBox(width: 10),
+              IconButton(
+                icon: Icon(FontAwesomeIcons.telegram,
+                    color: isConsultationClosed
+                        ? Colors.grey
+                        : Colors.teal,
+                    size: 40),
+                onPressed: isConsultationClosed || _chatProvider.isSending
+                    ? null
+                    : () {
+                  final text = _controller.text.trim();
+                  if (text.isEmpty) return;
+                  _chatProvider.sendMessage(
+                      widget.consultation.id!, text);
+                  _controller.clear();
+                },
+              ),
+            ],
           ),
         ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: _buildAppBar(),
+      body: Consumer<ChatProvider>(
+        builder: (context, prov, child) {
+          if (prov.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (prov.errorMessage != null) {
+            return Center(
+              child: Text(prov.errorMessage!,
+                  style: const TextStyle(color: Colors.red)),
+            );
+          }
+
+          return Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(18),
+                  itemCount: prov.chatHistory.length + 1,
+                  itemBuilder: (context, i) {
+                    if (i == 0) {
+                      return chat_info(
+                          name: "Consultation ${widget.consultation.id}");
+                    }
+                    final msg = prov.chatHistory[i - 1];
+                    final isUser = msg.senderType == MessageSenderType.USER;
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: _buildChatBubble(msg.content ?? '', isUser),
+                    );
+                  },
+                ),
+              ),
+              _buildMessageInputField(),
+            ],
+          );
+        },
       ),
     );
   }

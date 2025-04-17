@@ -3,27 +3,31 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:page_transition/page_transition.dart';
 
-import '../Views/chat_screen.dart'; // Assurez-vous d'importer votre écran de chat
+import '../Views/chat_screen.dart'; // Ensure you have imported your chat screen
 
 class ConsultationCard extends StatelessWidget {
   final String date;
   final String time;
   final String title;
+  /// New parameter for the consultation state (etat)
+  final String? etat;
 
-  const ConsultationCard(
-      {super.key, required this.date, required this.time, required this.title});
+  const ConsultationCard({
+    Key? key,
+    required this.date,
+    required this.time,
+    required this.title,
+    this.etat,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    // Determine the color of the side bar based on etat.
+    Color sideBarColor = const Color.fromARGB(255, 3, 190, 150);
+    if (etat.toString().contains("RECONSULTATION")) {
+      sideBarColor = Colors.red;
+    }
     return Center(
-      child: GestureDetector(
-        onTap: () {
-          Navigator.push(
-            context,
-            PageTransition(
-                type: PageTransitionType.fade, child: const ChatScreen()),
-          );
-        },
         child: Container(
           height: MediaQuery.of(context).size.height * 0.10,
           width: MediaQuery.of(context).size.width * 0.9,
@@ -34,20 +38,19 @@ class ConsultationCard extends StatelessWidget {
           ),
           child: Row(
             children: [
-              /// ✅ **Barre latérale verte**
+              /// Vertical bar with dynamic color.
               Container(
                 width: 8.0,
                 height: double.infinity,
-                decoration: const BoxDecoration(
-                  color: Color.fromARGB(255, 3, 190, 150),
-                  borderRadius: BorderRadius.only(
+                decoration: BoxDecoration(
+                  color: sideBarColor,
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(12.0),
                     bottomLeft: Radius.circular(12.0),
                   ),
                 ),
               ),
-
-              /// ✅ **Contenu de la carte**
+              /// Content of the card.
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
@@ -55,9 +58,8 @@ class ConsultationCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
-                    // ✅ Centrage vertical du texte
                     children: [
-                      /// ✅ **Titre de la consultation**
+                      /// Consultation title.
                       Text(
                         title,
                         style: const TextStyle(
@@ -67,53 +69,54 @@ class ConsultationCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 10.0),
-
-                      /// ✅ **Date et Heure alignées horizontalement**
-                      Row(children: [
-                        Container(
-                          height: MediaQuery.of(context).size.height * 0.03,
-                          width: MediaQuery.of(context).size.width * 0.07,
-                          decoration: const BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage("lib/icons/callender2.png"),
-                              filterQuality: FilterQuality.high,
+                      /// Date and Time aligned horizontally.
+                      Row(
+                        children: [
+                          Container(
+                            height: MediaQuery.of(context).size.height * 0.03,
+                            width: MediaQuery.of(context).size.width * 0.07,
+                            decoration: const BoxDecoration(
+                              image: DecorationImage(
+                                image: AssetImage("lib/icons/callender2.png"),
+                                filterQuality: FilterQuality.high,
+                              ),
                             ),
                           ),
-                        ),
-                        Text(
-                          date,
-                          style: GoogleFonts.poppins(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w600,
-                              color: const Color.fromARGB(255, 99, 99, 99)),
-                        ),
-                        Container(
-                          height: MediaQuery.of(context).size.height * 0.03,
-                          width: MediaQuery.of(context).size.width * 0.07,
-                          decoration: const BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage("lib/icons/watch.png"),
-                              filterQuality: FilterQuality.high,
+                          Text(
+                            date,
+                            style: GoogleFonts.poppins(
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w600,
+                                color:
+                                const Color.fromARGB(255, 99, 99, 99)),
+                          ),
+                          Container(
+                            height: MediaQuery.of(context).size.height * 0.03,
+                            width: MediaQuery.of(context).size.width * 0.07,
+                            decoration: const BoxDecoration(
+                              image: DecorationImage(
+                                image: AssetImage("lib/icons/watch.png"),
+                                filterQuality: FilterQuality.high,
+                              ),
                             ),
                           ),
-                        ),
-                        Text(
-                          time,
-                          style: GoogleFonts.poppins(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w600,
-                              color: const Color.fromARGB(255, 99, 99, 99)),
-                        ),
-                      ]),
+                          Text(
+                            time,
+                            style: GoogleFonts.poppins(
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w600,
+                                color:
+                                const Color.fromARGB(255, 99, 99, 99)),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
-
               ),
             ],
           ),
         ),
-      ),
     );
   }
 }

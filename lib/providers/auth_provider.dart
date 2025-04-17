@@ -1,5 +1,6 @@
 // lib/providers/auth_provider.dart
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:denti_plus/modals/doctorModal.dart';
 import 'package:denti_plus/modals/patientModal.dart';
@@ -196,6 +197,23 @@ class AuthProvider extends ChangeNotifier {
       return response;
     } catch (e) {
       throw Exception("Failed to update passwordggggg: ${e.toString()}");
+    }
+  }
+  Future<void> uploadProfilePhoto(File imageFile) async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+      final updatedUser = await _apiService.uploadProfilePhoto(imageFile);
+      _userDetect = updatedUser;
+      _errorMessage = null;
+      notifyListeners();
+    } catch (e) {
+      _errorMessage = e.toString();
+      notifyListeners();
+      throw e;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 

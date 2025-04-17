@@ -20,20 +20,20 @@ class Config {
       '$consultationDoctorUrl/consultations/$consultationId/reconsultation';
 
   // Consultation (Patient)
-  static const String consultationPatientUrl = '$baseUrl/consultation-patient';
-  static const String createConsultationUrl = '$consultationPatientUrl/';
+  static const String consultationPatientUrl = '$baseUrl/consultation-patient/';
+  static const String createConsultationUrl = '$consultationPatientUrl';
   static String addChatMessageUrl(int consultationId) =>
-      '$consultationPatientUrl/$consultationId/messages';
+      '$consultationPatientUrl$consultationId/messages';
   static String getConsultationUrl(int consultationId) =>
-      '$consultationPatientUrl/$consultationId';
+      '$consultationPatientUrl$consultationId';
   static String getConsultationChatHistoryUrl(int consultationId) =>
-      '$consultationPatientUrl/$consultationId/chat-history';
+      '$consultationPatientUrl$consultationId/chat-history';
   static String sendChatMessageUrl(int consultationId) =>
-      '$consultationPatientUrl/$consultationId/chat';
+      '$consultationPatientUrl$consultationId/chat';
   static String finishConsultationUrl(int consultationId) =>
-      '$consultationPatientUrl/$consultationId/finish';
+      '$consultationPatientUrl$consultationId/finish';
   static String addAppointmentUrl(int consultationId) =>
-      '$consultationPatientUrl/$consultationId/appointments';
+      '$consultationPatientUrl$consultationId/appointments';
 
   // Diagnostics
   static const String diagnosticsUrl = '$baseUrl/diagnostics';

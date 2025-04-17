@@ -3,7 +3,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 class chat_info extends StatelessWidget {
-  const chat_info({super.key});
+  final String name;
+
+  const chat_info({Key? key, required this.name}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +22,7 @@ class chat_info extends StatelessWidget {
         ),
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           Text(
-            "Consultion 1",
+            name,
             style: GoogleFonts.poppins(
                 fontSize: 16.sp,
                 fontWeight: FontWeight.w500,

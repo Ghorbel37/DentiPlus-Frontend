@@ -1,6 +1,7 @@
 // lib/services/api_service.dart
 
 import 'dart:convert';
+import 'dart:io';
 import 'package:denti_plus/modals/patientCreateModal.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
@@ -16,6 +17,7 @@ import '../modals/appointmentModal.dart';
 import '../modals/hypotheseModal.dart';
 import '../modals/symptomsModal.dart';
 import '../modals/chat_messageModal.dart';
+
 // Additionally, if you have a Token model or similar:
 // import '../modals/token.dart';
 
@@ -30,7 +32,8 @@ class ApiService {
       url,
       headers: {'Content-Type': 'application/x-www-form-urlencoded'},
       body: {
-        'username': email,  // Field name must be "username" (FastAPI requirement)
+        'username': email,
+        // Field name must be "username" (FastAPI requirement)
         'password': password,
       },
     );
@@ -53,15 +56,47 @@ class ApiService {
       return jsonDecode(response.body);
     } else {
       final errorBody = jsonDecode(response.body);
-      const errorMessage = "Incorrect email or password"; // Adjust based on your API
+      const errorMessage =
+          "Incorrect email or password"; // Adjust based on your API
       throw Exception(errorMessage);
     }
   }
+
   Future<void> _storeUserData(String email, String role, int id) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('email', email);
     await prefs.setString('role', role);
     await prefs.setInt('user_id', id);
+  }
+
+  // Add to ApiService class
+  Future<PatientCreate> uploadProfilePhoto(File imageFile) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access_token') ?? '';
+
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('${Config.usersUrl}/me/photo'),
+      )..headers['Authorization'] = 'Bearer $token';
+
+      request.files.add(await http.MultipartFile.fromPath(
+        'file',
+        imageFile.path,
+        filename: imageFile.path.split('/').last,
+      ));
+
+      final response = await request.send();
+      final responseBody = await response.stream.bytesToString();
+
+      if (response.statusCode == 200) {
+        return PatientCreate.fromJson(jsonDecode(responseBody));
+      } else {
+        throw Exception('Failed to upload photo: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      throw Exception('Failed to upload photo: $e');
+    }
   }
 
   // --------------------
@@ -87,7 +122,8 @@ class ApiService {
     throw Exception('Failed to load users by name');
   }
 
-  Future<Map<String, dynamic>> updatePassword(String currentPassword, String newPassword) async {
+  Future<Map<String, dynamic>> updatePassword(
+      String currentPassword, String newPassword) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('access_token') ?? '';
 
@@ -116,8 +152,6 @@ class ApiService {
     }
     throw Exception('Failed to update password: ${response.body}');
   }
-
-
 
   // --------------------
   // DOCTOR ENDPOINTS
@@ -155,7 +189,8 @@ class ApiService {
     throw Exception('Failed to create doctor: ${response.body}');
   }
 
-  Future<PatientCreate> updateDoctor(int id, PatientCreate updatedDoctor) async {
+  Future<PatientCreate> updateDoctor(
+      int id, PatientCreate updatedDoctor) async {
     final url = Uri.parse('${Config.doctorsUrl}/$id');
     final response = await http.put(
       url,
@@ -194,8 +229,8 @@ class ApiService {
     }
   }
 
-
-  Future<PatientCreate> updatePatient(int id, PatientCreate updatedPatient) async {
+  Future<PatientCreate> updatePatient(
+      int id, PatientCreate updatedPatient) async {
     final url = Uri.parse('${Config.patientsUrl}$id');
     final response = await http.put(
       url,
@@ -208,7 +243,6 @@ class ApiService {
     // Print or include the response body in the exception for debugging.
     throw Exception('Failed to update patient: ${response.body}');
   }
-
 
   // --------------------
   // CONSULTATION (DOCTOR) ENDPOINTS
@@ -234,7 +268,8 @@ class ApiService {
     throw Exception('No consultations found for etat $etat');
   }
 
-  Future<Consultation> validateConsultation(int consultationId, String doctorNote) async {
+  Future<Consultation> validateConsultation(
+      int consultationId, String doctorNote) async {
     final url = Uri.parse(Config.validateConsultationUrl(consultationId));
     final response = await http.post(
       url,
@@ -247,7 +282,8 @@ class ApiService {
     throw Exception('Failed to validate consultation');
   }
 
-  Future<Consultation> markReconsultation(int consultationId, String doctorNote) async {
+  Future<Consultation> markReconsultation(
+      int consultationId, String doctorNote) async {
     final url = Uri.parse(Config.reconsultationUrl(consultationId));
     final response = await http.post(
       url,
@@ -264,12 +300,21 @@ class ApiService {
   // CONSULTATION (PATIENT) ENDPOINTS
   // --------------------
 
-  Future<Consultation> createConsultation(Map<String, dynamic> consultationData) async {
+  Future<Consultation> createConsultation(
+      Map<String, dynamic> consultationData) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access_token') ?? '';
+
+    // Optional: Debug print the token (remove in production)
+    print("Using token: $token");
     // Here you could pass a ConsultationCreate model or simply a Map.
     final url = Uri.parse(Config.createConsultationUrl);
     final response = await http.post(
       url,
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
       body: jsonEncode(consultationData),
     );
     if (response.statusCode == 200 || response.statusCode == 201) {
@@ -278,7 +323,8 @@ class ApiService {
     throw Exception('Failed to create consultation');
   }
 
-  Future<ChatMessage> addChatMessage(int consultationId, Map<String, dynamic> messageData) async {
+  Future<ChatMessage> addChatMessage(
+      int consultationId, Map<String, dynamic> messageData) async {
     final url = Uri.parse(Config.addChatMessageUrl(consultationId));
     final response = await http.post(
       url,
@@ -292,17 +338,41 @@ class ApiService {
   }
 
   Future<Consultation> getConsultation(int consultationId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access_token') ?? '';
+
+    // Optional: Debug print the token (remove in production)
+    print("Using token: $token");
     final url = Uri.parse(Config.getConsultationUrl(consultationId));
-    final response = await http.get(url);
+    final response = await http.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
     if (response.statusCode == 200) {
       return Consultation.fromJson(jsonDecode(response.body));
     }
     throw Exception('Consultation not found');
   }
 
-  Future<List<ChatMessage>> getConsultationChatHistory(int consultationId) async {
+  Future<List<ChatMessage>> getConsultationChatHistory(
+      int consultationId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access_token') ?? '';
+
+    // Optional: Debug print the token (remove in production)
+    print("Using token: $token");
+
     final url = Uri.parse(Config.getConsultationChatHistoryUrl(consultationId));
-    final response = await http.get(url);
+    final response = await http.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body) as List;
       return data.map((json) => ChatMessage.fromJson(json)).toList();
@@ -310,11 +380,21 @@ class ApiService {
     return [];
   }
 
-  Future<String> sendChatMessage(int consultationId, Map<String, dynamic> chatData) async {
+  Future<String> sendChatMessage(
+      int consultationId, Map<String, dynamic> chatData) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access_token') ?? '';
+
+    // Optional: Debug print the token (remove in production)
+    print("Using token: $token");
+
     final url = Uri.parse(Config.sendChatMessageUrl(consultationId));
     final response = await http.post(
       url,
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
       body: jsonEncode(chatData),
     );
     if (response.statusCode == 200) {
@@ -333,7 +413,8 @@ class ApiService {
     throw Exception('Failed to finish consultation chat');
   }
 
-  Future<Appointment> addAppointment(int consultationId, Map<String, dynamic> appointmentData) async {
+  Future<Appointment> addAppointment(
+      int consultationId, Map<String, dynamic> appointmentData) async {
     final url = Uri.parse(Config.addAppointmentUrl(consultationId));
     final response = await http.post(
       url,
@@ -344,6 +425,25 @@ class ApiService {
       return Appointment.fromJson(jsonDecode(response.body));
     }
     throw Exception('Failed to add appointment');
+  }
+
+  Future<List<Consultation>> getPatientConsultations() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access_token') ?? '';
+    final url = Uri.parse(Config
+        .consultationPatientUrl); // Make sure to define this URL in your Config class.
+    final response = await http.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body) as List;
+      return data.map((json) => Consultation.fromJson(json)).toList();
+    }
+    throw Exception('No consultations found: ${response.body}');
   }
 
   // --------------------
@@ -359,8 +459,10 @@ class ApiService {
     throw Exception('No diagnostics found for patient');
   }
 
-  Future<List<dynamic>> getDiagnosticsByPatientAndEtat(int patientId, String etat) async {
-    final url = Uri.parse(Config.getDiagnosticsByPatientAndEtatUrl(patientId, etat));
+  Future<List<dynamic>> getDiagnosticsByPatientAndEtat(
+      int patientId, String etat) async {
+    final url =
+        Uri.parse(Config.getDiagnosticsByPatientAndEtatUrl(patientId, etat));
     final response = await http.get(url);
     if (response.statusCode == 200) {
       return jsonDecode(response.body) as List;
@@ -390,7 +492,8 @@ class ApiService {
     throw Exception('Failed to create diagnostic');
   }
 
-  Future<List<dynamic>> getConversationHistoryForDiagnostic(int diagnosticId) async {
+  Future<List<dynamic>> getConversationHistoryForDiagnostic(
+      int diagnosticId) async {
     final url = Uri.parse(Config.getConversationHistoryUrl(diagnosticId));
     final response = await http.get(url);
     if (response.statusCode == 200) {
@@ -399,7 +502,8 @@ class ApiService {
     throw Exception('No conversation history found');
   }
 
-  Future<String> addConversationHistory(int diagnosticId, Map<String, dynamic> conversationData) async {
+  Future<String> addConversationHistory(
+      int diagnosticId, Map<String, dynamic> conversationData) async {
     final url = Uri.parse(Config.addConversationUrl(diagnosticId));
     final response = await http.post(
       url,
@@ -422,7 +526,8 @@ class ApiService {
     throw Exception('Failed to finish diagnostic');
   }
 
-  Future<dynamic> respondToConsultation(int diagnosticId, String etat, String doctorNote) async {
+  Future<dynamic> respondToConsultation(
+      int diagnosticId, String etat, String doctorNote) async {
     final url = Uri.parse(Config.respondToConsultationUrl(diagnosticId));
     final response = await http.put(
       url,
@@ -439,7 +544,8 @@ class ApiService {
   // LLM DIAGNOSIS ENDPOINTS (if applicable)
   // --------------------
 
-  Future<dynamic> diagnosePatientEn(List<String> symptoms, {String? additionalDetails}) async {
+  Future<dynamic> diagnosePatientEn(List<String> symptoms,
+      {String? additionalDetails}) async {
     final url = Uri.parse(Config.diagnoseEnUrl);
     final response = await http.post(
       url,
@@ -455,7 +561,8 @@ class ApiService {
     throw Exception('Failed to diagnose (EN)');
   }
 
-  Future<dynamic> diagnosePatientFr(List<String> symptoms, {String? additionalDetails}) async {
+  Future<dynamic> diagnosePatientFr(List<String> symptoms,
+      {String? additionalDetails}) async {
     final url = Uri.parse(Config.diagnoseFrUrl);
     final response = await http.post(
       url,

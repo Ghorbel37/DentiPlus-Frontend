@@ -4,14 +4,15 @@ class PatientCreate {
   final int? id;
   final String? email;
   final String? name;
-  final String? adress;       // spelled 'adress' to match your backend
-  final String? birthdate;   // optional
+  final String? adress; // spelled 'adress' to match your backend
+  final String? birthdate; // optional
   final String? phoneNumber; // optional
   final int? calories;
   final int? frequenceCardiaque;
   final int? poids;
   final String? password;
   final String? role;
+  final String? profilePhoto;
 
   PatientCreate({
     this.id,
@@ -25,6 +26,7 @@ class PatientCreate {
     this.poids,
     this.password,
     this.role,
+    this.profilePhoto,
   });
 
   PatientCreate copyWith({
@@ -38,6 +40,7 @@ class PatientCreate {
     int? calories,
     int? frequenceCardiaque,
     int? poids,
+    String? profilePhoto,
   }) {
     return PatientCreate(
       id: id ?? this.id,
@@ -50,22 +53,25 @@ class PatientCreate {
       calories: calories ?? this.calories,
       frequenceCardiaque: frequenceCardiaque ?? this.frequenceCardiaque,
       poids: poids ?? this.poids,
+      profilePhoto: profilePhoto ?? this.profilePhoto,
     );
   }
+
   // Convert from JSON
   factory PatientCreate.fromJson(Map<String, dynamic> json) {
     return PatientCreate(
       id: json['id'] as int?,
       email: json['email'] as String?,
-      name: json['name']as String?,
-      adress: json['adress']as String?,
+      name: json['name'] as String?,
+      adress: json['adress'] as String?,
       birthdate: json['birthdate'] as String?,
       phoneNumber: json['phoneNumber'] as String?,
       calories: json['calories'] as int?,
-      frequenceCardiaque: json['frequenceCardiaque']as int?,
+      frequenceCardiaque: json['frequenceCardiaque'] as int?,
       poids: json['poids'] as int?,
-      password: json['password']as String?,
-      role:  json['role'] as String?,
+      password: json['password'] as String?,
+      role: json['role'] as String?,
+      profilePhoto: json['profile_photo'],
     );
   }
 
@@ -82,7 +88,8 @@ class PatientCreate {
       'frequenceCardiaque': frequenceCardiaque,
       'poids': poids,
       'password': password,
-      'role' : role,
+      'role': role,
+      'profile_photo': profilePhoto,
     };
   }
 }

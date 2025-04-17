@@ -38,12 +38,12 @@ class BannerWidget extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () {
                       // Navigate to the conversation screen or start a new chat
-                      Navigator.push(
+                      /*Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => ChatScreen(), // Replace with your actual chat screen
                         ),
-                      );
+                      );*/
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF048A6D),

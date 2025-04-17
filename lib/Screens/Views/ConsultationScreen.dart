@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:denti_plus/Screens/Views/shedule_tab1.dart';
 import 'package:denti_plus/Screens/Views/shedule_tab2.dart';
 import 'package:denti_plus/Screens/Widgets/TabbarPages/tab1.dart';
 import 'package:denti_plus/Screens/Widgets/TabbarPages/tab2.dart';
 import 'package:denti_plus/Screens/Login-Signup/login.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../../modals/consultationModal.dart';
+import '../../providers/conversation_provider.dart';
+import '../../services/api_service.dart';
 import '../Widgets/consultationCard.dart';
 import 'chat_screen.dart';
 
@@ -15,12 +20,13 @@ class Consultationscreen extends StatefulWidget {
   const Consultationscreen({Key? key}) : super(key: key);
 
   @override
-  _TabBarExampleState createState() => _TabBarExampleState();
+  _ConsultationscreenState createState() => _ConsultationscreenState();
 }
 
-class _TabBarExampleState extends State<Consultationscreen>
+class _ConsultationscreenState extends State<Consultationscreen>
     with SingleTickerProviderStateMixin {
   late TabController tabController;
+
   // Liste de données pour les cartes de consultation
   final List<Map<String, String>> consultationData = [
     {'date': '26/06/2022', 'time': '10:30 AM', 'title': 'Consultation 3'},
@@ -29,10 +35,14 @@ class _TabBarExampleState extends State<Consultationscreen>
     {'date': '28/06/2022', 'time': '12:00 PM', 'title': 'Consultation 5'},
     {'date': '28/06/2022', 'time': '12:00 PM', 'title': 'Consultation 5'},
   ];
+
   @override
   void initState() {
     super.initState();
-    tabController = TabController(length: 3, vsync: this);
+    tabController = TabController(length: 2, vsync: this);
+    // Fetch consultations on screen init.
+    Provider.of<ConversationProvider>(context, listen: false)
+        .fetchConsultations();
   }
 
   @override
@@ -49,7 +59,9 @@ class _TabBarExampleState extends State<Consultationscreen>
         title: Text(
           "Liste des Consultations",
           style: GoogleFonts.poppins(
-              color: Colors.black, fontWeight: FontWeight.w700, fontSize: 20.sp),
+              color: Colors.black,
+              fontWeight: FontWeight.w700,
+              fontSize: 20.sp),
         ),
         centerTitle: false,
         elevation: 0,
@@ -70,104 +82,183 @@ class _TabBarExampleState extends State<Consultationscreen>
         ],
         backgroundColor: Colors.white,
       ),
-      body: SingleChildScrollView(
-        physics: NeverScrollableScrollPhysics(),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 00),
-          child: Column(
-            children: [
-              Container(
-                height: MediaQuery.of(context).size.height,
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 15),
-                            child: Container(
-                              width: double.infinity,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  width: 2,
-                                  color: const Color.fromARGB(255, 3, 190, 150),
-                                ),
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(25),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.05),
-                                    blurRadius: 6,
-                                    spreadRadius: 1,
-                                    offset: const Offset(0, 3),
+      body: Consumer<ConversationProvider>(
+          builder: (context, consultationProvider, child) {
+        if (consultationProvider.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (consultationProvider.errorMessage != null) {
+          return Center(
+              child: Text(consultationProvider.errorMessage!,
+                  style: const TextStyle(color: Colors.red)));
+        }
+        return Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 15),
+                              child: Container(
+                                width: double.infinity,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    width: 2,
+                                    color:
+                                        const Color.fromARGB(255, 3, 190, 150),
                                   ),
-                                ],
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(25),
-                                child: TabBar(
-                                  controller: tabController,
-                                  indicator: BoxDecoration(
-                                    color: const Color.fromARGB(255, 3, 190, 150),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  indicatorSize: TabBarIndicatorSize.tab,
-                                  labelPadding: EdgeInsets.zero,
-                                  unselectedLabelColor: Colors.black54,
-                                  labelColor: Colors.white,
-                                  labelStyle: TextStyle(
-                                      fontSize: 16.sp, fontWeight: FontWeight.w500),
-                                  tabs: const [
-                                    Expanded(
-                                      child: Tab(text: "Encore"),
-                                    ),
-                                    Expanded(
-                                      child: Tab(text: "Validé"),
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(25),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.05),
+                                      blurRadius: 6,
+                                      spreadRadius: 1,
+                                      offset: const Offset(0, 3),
                                     ),
                                   ],
                                 ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(25),
+                                  child: TabBar(
+                                    controller: tabController,
+                                    indicator: BoxDecoration(
+                                      color: const Color.fromARGB(
+                                          255, 3, 190, 150),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    indicatorSize: TabBarIndicatorSize.tab,
+                                    labelPadding: EdgeInsets.zero,
+                                    unselectedLabelColor: Colors.black54,
+                                    labelColor: Colors.white,
+                                    labelStyle: TextStyle(
+                                        fontSize: 16.sp,
+                                        fontWeight: FontWeight.w500),
+                                    tabs: const [
+                                      Expanded(
+                                        child: Tab(text: "Encore"),
+                                      ),
+                                      Expanded(
+                                        child: Tab(text: "Validé"),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 20),
-                    Expanded(
-                      child: TabBarView(
-                        controller: tabController,
-                        children: [
-                          ListView(
-                            children: consultationData.map((data) {
-                              return ConsultationCard(
-                                date: data['date']!,
-                                time: data['time']!,
-                                title: data['title']!,
-                              );
-                            }).toList(),
-                          ),
-                          shedule_tab2(),
-                        ],
+                      const SizedBox(height: 20),
+                      Expanded(
+                        child: TabBarView(
+                          controller: tabController,
+                          children: [
+                            // First tab: "ENCORE" consultations.
+                            // Inside your TabBarView’s first ListView.builder (Encore):
+                            ListView.builder(
+                              itemCount: consultationProvider
+                                  .encoreConsultations.length,
+                              itemBuilder: (context, index) {
+                                final consultation = consultationProvider
+                                    .encoreConsultations[index];
+                                final dt = consultation.date!;
+                                final formattedDate =
+                                    DateFormat('dd/MM/yyyy').format(dt);
+                                final formattedTime =
+                                    DateFormat('hh:mm a').format(dt);
+
+                                return GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => ChatScreen(
+                                            consultation: consultation),
+                                      ),
+                                    ).then((_) {
+                                      consultationProvider.fetchConsultations();
+                                    });
+                                  },
+                                  child: ConsultationCard(
+                                    date: formattedDate,
+                                    time: formattedTime,
+                                    title: "Consultation ${consultation.id!}",
+                                    etat: consultation.etat?.toString(),
+                                  ),
+                                );
+                              },
+                            ),
+
+                            // Second tab: "VALIDÉ" consultations.
+                            // And likewise for the Validé tab:
+                            ListView.builder(
+                              itemCount: consultationProvider
+                                  .valideConsultations.length,
+                              itemBuilder: (context, index) {
+                                final consultation = consultationProvider
+                                    .valideConsultations[index];
+                                final dt = consultation.date!;
+                                final formattedDate =
+                                    DateFormat('dd/MM/yyyy').format(dt);
+                                final formattedTime =
+                                    DateFormat('hh:mm a').format(dt);
+
+                                return GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => ChatScreen(
+                                            consultation: consultation),
+                                      ),
+                                    ).then((_) {
+                                      consultationProvider.fetchConsultations();
+                                    });
+                                  },
+                                  child: ConsultationCard(
+                                    date: formattedDate,
+                                    time: formattedTime,
+                                    title: "Consultation ${consultation.id!}",
+                                    etat: consultation.etat?.toString(),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+              ],
+        );
+      }),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Navigate to the conversation screen or start a new chat
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ChatScreen(), // Replace with your actual chat screen
-            ),
-          );
+        onPressed: () async {
+          try {
+            // Create a new consultation via the provider.
+            final consultationProvider =
+                Provider.of<ConversationProvider>(context, listen: false);
+            Consultation newConsultation =
+                await consultationProvider.createNewConsultation();
+
+            // Once created, navigate to the ChatScreen.
+            // You can pass the new consultation object (or its id) to the ChatScreen.
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ChatScreen(consultation: newConsultation),
+              ),
+            ).then((_) {
+              consultationProvider.fetchConsultations();
+            });
+          } catch (e) {
+            // Optionally show an error message if creation fails.
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(e.toString())),
+            );
+          }
         },
         backgroundColor: const Color.fromARGB(255, 3, 190, 150),
         child: Container(
@@ -182,6 +273,5 @@ class _TabBarExampleState extends State<Consultationscreen>
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
-
   }
 }
