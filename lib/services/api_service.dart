@@ -2,10 +2,12 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:denti_plus/modals/patientCreateModal.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../modals/diagModal.dart';
 import 'config.dart';
 
 // Import your model classes here. For example:
@@ -96,6 +98,31 @@ class ApiService {
       }
     } catch (e) {
       throw Exception('Failed to upload photo: $e');
+    }
+  }
+
+  /// Fetches the current user’s profile photo as raw bytes.
+  /// Returns a [Uint8List] that you can feed into a MemoryImage.
+  Future<Uint8List> fetchProfilePhoto() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access_token') ?? '';
+
+    final url = Uri.parse('${Config.usersUrl}/me/photo');
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Accept': 'application/octet-stream',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      // bodyBytes is the raw image data
+      return response.bodyBytes;
+    } else {
+      throw Exception(
+        'Failed to load profile photo (${response.statusCode}): ${response.reasonPhrase}',
+      );
     }
   }
 
@@ -249,13 +276,41 @@ class ApiService {
   // --------------------
 
   Future<List<Consultation>> getDoctorConsultations() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access_token') ?? '';
+
     final url = Uri.parse(Config.getAllDoctorConsultationsUrl);
-    final response = await http.get(url);
+    final response = await http.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body) as List;
       return data.map((json) => Consultation.fromJson(json)).toList();
     }
     throw Exception('No consultations found for the doctor');
+  }
+
+  Future<Diagmodal> getDoctorConsultationByID(int id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access_token') ?? '';
+
+    final url = Uri.parse(Config.getDoctorConsultationByIdUrl(id));
+    final response = await http.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return Diagmodal.fromJson(data);
+    }
+    throw Exception('No consultation found with id : $id');
   }
 
   Future<List<Consultation>> getDoctorConsultationsByEtat(String etat) async {

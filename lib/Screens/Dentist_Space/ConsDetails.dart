@@ -1,15 +1,20 @@
 import 'package:denti_plus/Screens/Views/Homepage.dart';
+import 'package:denti_plus/modals/diagModal.dart';
+import 'package:denti_plus/providers/doctor_consultations_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:denti_plus/Screens/Widgets/doctorList.dart';
 import 'package:denti_plus/Screens/Views/doctor_details_screen.dart';
 
 class Consdetails extends StatefulWidget {
   final bool showBottomAppBar;
+  final int idCons;
 
-  const Consdetails({super.key, required this.showBottomAppBar});
+  const Consdetails(
+      {super.key, required this.showBottomAppBar, required this.idCons});
 
   @override
   State<Consdetails> createState() => _appointmentState();
@@ -17,7 +22,25 @@ class Consdetails extends StatefulWidget {
 
 class _appointmentState extends State<Consdetails> {
   @override
+  void initState() {
+    super.initState();
+    final provider =
+        Provider.of<DoctorConsultationsProvider>(context, listen: false);
+    provider.fetchConsultationById(widget.idCons);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final provider = context.watch<DoctorConsultationsProvider>();
+    final Diagmodal? consultation = provider.consultation;
+    // Error state
+    if (provider.errorMessage != null) {
+      return Center(child: Text(provider.errorMessage!));
+    }
+    // Loading state
+    if (consultation == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -47,8 +70,8 @@ class _appointmentState extends State<Consdetails> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'BS Mayсса',
+                  Text(
+                    '${consultation.patient?.name ?? ''}',
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const Text(
@@ -59,22 +82,34 @@ class _appointmentState extends State<Consdetails> {
                   // ** Reason Selection **
                   SizedBox(height: 15),
                   buildSectionTitle("Contact"),
-                  buildPaymentRow("Téléphone", "+216 53 150 805"),
-                  buildPaymentRow("Adresse", "Rue Dah , Zeramdine"),
+                  buildPaymentRow("Email", consultation.patient?.email ?? ''),
+                  buildPaymentRow(
+                      "Adresse", consultation.patient?.adress ?? ''),
+                  const Divider(color: Colors.black12, thickness: 1),
+                  buildSectionTitle("Symptômes"),
+                  if (consultation.symptoms != null)
+                    ...consultation.symptoms!.map((s) => buildRow(
+                          "", // or whatever your Symptoms model exposes
+                          '${s.symptom}', // adapt to your field names
+                        )),
                   const Divider(color: Colors.black12, thickness: 1),
                   // ** Symptome Details **
-                  SizedBox(height: 20),
-                  buildSectionTitle("Symptome Details"),
-                  buildPaymentRow("Douleur", "%80"),
-                  buildPaymentRow("Sommeil perturbé", "%60"),
+                  SizedBox(height: 15),
+                  buildSectionTitle("Les Hypothèses"),
+                  if (consultation.hypotheses != null)
+                    ...consultation.hypotheses!.map((s) => buildPaymentRow(
+                          s.condition!,
+                          // or whatever your Symptoms model exposes
+                          '${s.confidence}%', // adapt to your field names
+                        )),
                   const Divider(color: Colors.black12, thickness: 1),
 
                   // ** Payment Method Selection with Dropdown **
                   SizedBox(height: 20),
-                  buildSectionTitle("Diagnostique"),
+                  buildSectionTitle("Diagnostique d'Assistant"),
                   SizedBox(height: 8),
                   Text(
-                    "OBH COMBI is a cough medicine containing, Paracetamol, Ephedrine HCl, and Chlorphenamine maleate which is used to relieve coughs accompanied by flu symptoms such as fever, headache, and sneezing...",
+                    consultation.diagnosis ?? '',
                     style: GoogleFonts.poppins(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w300,
@@ -82,6 +117,17 @@ class _appointmentState extends State<Consdetails> {
                     ),
                   ),
                   SizedBox(height: 10),
+                  buildSectionTitle("Avis Docteur"),
+                  SizedBox(height: 8),
+                  Text(
+                    consultation.doctorNote ??
+                        'Pas encore mentionner votre avis!',
+                    style: GoogleFonts.poppins(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w300,
+                      color: Colors.black87,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -91,7 +137,8 @@ class _appointmentState extends State<Consdetails> {
             BottomAppBar(
               shape: const CircularNotchedRectangle(),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 5),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 40, vertical: 5),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -154,7 +201,8 @@ class _appointmentState extends State<Consdetails> {
   Widget buildSectionTitle(String title) {
     return Text(
       title,
-      style: GoogleFonts.poppins(fontSize: 16.sp, fontWeight: FontWeight.w600, color: Colors.black87),
+      style: GoogleFonts.poppins(
+          fontSize: 16.sp, fontWeight: FontWeight.w600, color: Colors.black87),
     );
   }
 
@@ -171,13 +219,18 @@ class _appointmentState extends State<Consdetails> {
               color: Color.fromARGB(255, 247, 247, 247),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Center(child: Image.asset(iconPath, height: 24, width: 24)), // Fixed icon alignment
+            child: Center(
+                child: Image.asset(iconPath,
+                    height: 24, width: 24)), // Fixed icon alignment
           ),
           SizedBox(width: 10),
           Expanded(
             child: Text(
               text,
-              style: GoogleFonts.poppins(fontSize: 16.sp, fontWeight: FontWeight.w500, color: Colors.black87),
+              style: GoogleFonts.poppins(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black87),
             ),
           ),
         ],
@@ -194,12 +247,47 @@ class _appointmentState extends State<Consdetails> {
         children: [
           Text(
             label,
-            style: GoogleFonts.poppins(fontSize: 15.sp, color: isTotal ? Colors.black87 : Colors.black54, fontWeight: isTotal ? FontWeight.w500 : FontWeight.normal),
+            style: GoogleFonts.poppins(
+                fontSize: 15.sp,
+                color: isTotal ? Colors.black87 : Colors.black54,
+                fontWeight: isTotal ? FontWeight.w500 : FontWeight.normal),
           ),
           Text(
             amount,
-            style: GoogleFonts.poppins(fontSize: 16.sp, color: isTotal ? Color.fromARGB(255, 4, 92, 58) : Colors.black87, fontWeight: isTotal ? FontWeight.w600 : FontWeight.normal),
+            style: GoogleFonts.poppins(
+                fontSize: 16.sp,
+                color:
+                    isTotal ? Color.fromARGB(255, 4, 92, 58) : Colors.black87,
+                fontWeight: isTotal ? FontWeight.w600 : FontWeight.normal),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildRow(String label, String amount, {bool isTotal = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: GoogleFonts.poppins(
+                fontSize: 15.sp,
+                color: isTotal ? Colors.black87 : Colors.black54,
+                fontWeight: isTotal ? FontWeight.w500 : FontWeight.normal),
+          ),
+          Expanded(
+            child: Text(
+              amount,
+              style: GoogleFonts.poppins(
+                  fontSize: 16.sp,
+                  color:
+                      isTotal ? Color.fromARGB(255, 4, 92, 58) : Colors.black87,
+                  fontWeight: isTotal ? FontWeight.w600 : FontWeight.normal),
+            ),
+          )
         ],
       ),
     );
@@ -237,7 +325,8 @@ class _appointmentState extends State<Consdetails> {
                     SizedBox(width: 8),
                     Text(
                       'Entrez votre note',
-                      style: TextStyle(fontSize: 18,
+                      style: TextStyle(
+                          fontSize: 18,
                           color: Colors.teal,
                           fontWeight: FontWeight.bold),
                     ),
@@ -301,7 +390,8 @@ class _appointmentState extends State<Consdetails> {
         return Dialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
-            side: BorderSide(color: const Color.fromARGB(255, 254, 92, 92), width: 3),
+            side: BorderSide(
+                color: const Color.fromARGB(255, 254, 92, 92), width: 3),
           ),
           elevation: 10,
           child: Container(
@@ -322,11 +412,13 @@ class _appointmentState extends State<Consdetails> {
               children: [
                 const Row(
                   children: [
-                    Icon(Icons.edit, color: const Color.fromARGB(255, 254, 92, 92)),
+                    Icon(Icons.edit,
+                        color: const Color.fromARGB(255, 254, 92, 92)),
                     SizedBox(width: 8),
                     Text(
                       'Entrez votre note',
-                      style: TextStyle(fontSize: 18,
+                      style: TextStyle(
+                          fontSize: 18,
                           color: const Color.fromARGB(255, 254, 92, 92),
                           fontWeight: FontWeight.bold),
                     ),
@@ -370,7 +462,9 @@ class _appointmentState extends State<Consdetails> {
                       },
                       child: const Text(
                         "Annuler",
-                        style: TextStyle(color: const Color.fromARGB(255, 254, 92, 92), fontSize: 16),
+                        style: TextStyle(
+                            color: const Color.fromARGB(255, 254, 92, 92),
+                            fontSize: 16),
                       ),
                     ),
                   ],

@@ -10,7 +10,7 @@ import 'hypotheseModal.dart';
 import 'symptomsModal.dart';
 import 'chat_messageModal.dart';
 
-class Consultation {
+class Diagmodal {
   final int? id;
   final DateTime? date;
   final String? diagnosis;
@@ -19,16 +19,12 @@ class Consultation {
   final EtatConsultation? etat;
   final double? fraisAdministratives;
   final double? prix;
-  final int? doctorId;
-  final int? patientId;
-  final Doctor? doctor;
   final PatientCreate? patient;
-  final Appointment? appointment;
   final List<Hypothese>? hypotheses;
   final List<Symptoms>? symptoms;
   final List<ChatMessage>? chatMessages;
 
-  Consultation({
+  Diagmodal({
     this.id,
     this.date,
     this.diagnosis,
@@ -37,18 +33,14 @@ class Consultation {
     this.etat,
     this.fraisAdministratives,
     this.prix,
-    this.doctorId,
-    this.patientId,
-    this.doctor,
     this.patient,
-    this.appointment,
     this.hypotheses,
     this.symptoms,
     this.chatMessages,
   });
 
-  factory Consultation.fromJson(Map<String, dynamic> json) {
-    return Consultation(
+  factory Diagmodal.fromJson(Map<String, dynamic> json) {
+    return Diagmodal(
       id: json['id'] as int?,
       date: json['date'] != null ? DateTime.tryParse(json['date']) : null,
       diagnosis: json['diagnosis'] as String?,
@@ -57,11 +49,7 @@ class Consultation {
       etat: json['etat'] != null ? etatConsultationFromString(json['etat']) : null,
       fraisAdministratives: (json['fraisAdministratives'] as num?)?.toDouble(),
       prix: (json['prix'] as num?)?.toDouble(),
-      doctorId: json['doctor_id'] as int?,
-      patientId: json['patient_id'] as int?,
-      doctor: json['doctor'] != null ? Doctor.fromJson(json['doctor']) : null,
       patient: json['patient'] != null ? PatientCreate.fromJson(json['patient']) : null,
-      appointment: json['appointment'] != null ? Appointment.fromJson(json['appointment']) : null,
       hypotheses: json['hypotheses'] != null
           ? List<Hypothese>.from(
           json['hypotheses'].map((x) => Hypothese.fromJson(x)))
@@ -87,11 +75,7 @@ class Consultation {
       'etat': etat != null ? etatConsultationToString(etat!) : null,
       'fraisAdministratives': fraisAdministratives,
       'prix': prix,
-      'doctor_id': doctorId,
-      'patient_id': patientId,
-      'doctor': doctor?.toJson(),
       'patient': patient?.toJson(),
-      'appointment': appointment?.toJson(),
       'hypotheses': hypotheses?.map((x) => x.toJson()).toList(),
       'symptoms': symptoms?.map((x) => x.toJson()).toList(),
       'chat_messages': chatMessages?.map((x) => x.toJson()).toList(),

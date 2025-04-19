@@ -14,6 +14,8 @@ class Config {
   // Filtered consultations by etat
   static String getDoctorConsultationsByEtatUrl(String etat) =>
       '$consultationDoctorUrl/consultations/by-etat/$etat';
+  static String getDoctorConsultationByIdUrl(int id) =>
+      '$consultationDoctorUrl/consultations/$id';
   static String validateConsultationUrl(int consultationId) =>
       '$consultationDoctorUrl/consultations/$consultationId/validate';
   static String reconsultationUrl(int consultationId) =>
@@ -77,4 +79,5 @@ class Config {
   // LLM diagnosis endpoints (if used separately)
   static const String diagnoseEnUrl = '$baseUrl/diagnose-en';
   static const String diagnoseFrUrl = '$baseUrl/diagnose-fr';
+
 }

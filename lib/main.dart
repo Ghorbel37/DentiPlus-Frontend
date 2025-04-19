@@ -1,6 +1,7 @@
 import 'package:denti_plus/Screens/Widgets/RootWrapper.dart';
 import 'package:denti_plus/providers/chat_provider.dart';
 import 'package:denti_plus/providers/conversation_provider.dart';
+import 'package:denti_plus/providers/doctor_consultations_provider.dart';
 import 'package:denti_plus/providers/patient_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -31,6 +32,7 @@ class DentiPlus extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => PatientProvider()),
         ChangeNotifierProvider(create: (_) => ConversationProvider()),
         ChangeNotifierProvider(create: (_) => ChatProvider()),
+        ChangeNotifierProvider(create: (_) => DoctorConsultationsProvider()),
       ],
       child: ResponsiveSizer(
         builder: (context, orientation, screenType) {

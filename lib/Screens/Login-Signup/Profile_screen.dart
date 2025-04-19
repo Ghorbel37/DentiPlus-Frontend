@@ -66,7 +66,7 @@ class Profile_screen extends StatelessWidget {
                         width: 110,
                         height: 110,
                         decoration: BoxDecoration(
-                          border: Border.all(width: 4, color: Colors.white),
+                          border: Border.all(width: 5, color: Colors.white),
                           boxShadow: [
                             BoxShadow(
                                 spreadRadius: 2,
@@ -75,11 +75,9 @@ class Profile_screen extends StatelessWidget {
                           ],
                           shape: BoxShape.circle,
                           image: DecorationImage(
-                            image: provider.userDetect?.profilePhoto != null
-                                ? NetworkImage(
-                                    '${Config.baseUrl}${provider.userDetect!.profilePhoto}')
-                                : const AssetImage("lib/icons/avatar.png")
-                                    as ImageProvider,
+                            image: provider.profilePhoto != null
+                                ? MemoryImage(provider.profilePhoto!)
+                                : AssetImage('lib/icons/avatar.png') as ImageProvider,
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -113,9 +111,9 @@ class Profile_screen extends StatelessWidget {
                 ),
                 const SizedBox(height: 30),
                 Text(
-                  "Amelia Renata",
+                  provider.userDetect?.name ?? 'Utilisateur',
                   style: GoogleFonts.poppins(
-                      fontSize: 16.sp,
+                      fontSize: 19.sp,
                       fontWeight: FontWeight.w600,
                       color: Colors.white),
                 ),

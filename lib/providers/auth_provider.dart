@@ -1,6 +1,7 @@
 // lib/providers/auth_provider.dart
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:denti_plus/modals/doctorModal.dart';
 import 'package:denti_plus/modals/patientModal.dart';
@@ -32,6 +33,9 @@ class AuthProvider extends ChangeNotifier {
   PatientCreate? _fetchedUser;
   PatientCreate? get fetchedUser => _fetchedUser;
 
+  Uint8List? _profilePhoto;
+  Uint8List? get profilePhoto => _profilePhoto;
+
   Future<void> initAuth() async {
     // Initial setup: read token and basic info from SharedPreferences
     final prefs = await SharedPreferences.getInstance();
@@ -48,11 +52,23 @@ class AuthProvider extends ChangeNotifier {
       }
     }
     _isInitializing = false;
+    await fetchProfilePhoto();
     notifyListeners();
   }
 
   AuthProvider() {
     initAuth();
+  }
+
+  Future<void> fetchProfilePhoto() async {
+    try {
+      final bytes = await _apiService.fetchProfilePhoto();
+      _profilePhoto = bytes;
+      _errorMessage = null;
+    } catch (e) {
+      _errorMessage = e.toString();
+    }
+    notifyListeners();
   }
 
   /// Logs in a user with [email] and [password].
@@ -205,6 +221,7 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
       final updatedUser = await _apiService.uploadProfilePhoto(imageFile);
       _userDetect = updatedUser;
+      await fetchProfilePhoto();
       _errorMessage = null;
       notifyListeners();
     } catch (e) {
@@ -216,7 +233,6 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
-
 
 
   /// Logs out the current user.

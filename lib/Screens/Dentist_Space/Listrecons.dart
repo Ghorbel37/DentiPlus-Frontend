@@ -1,3 +1,4 @@
+import 'package:denti_plus/modals/diagModal.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -6,14 +7,24 @@ import 'package:page_transition/page_transition.dart';
 import '../Views/chat_screen.dart';
 import 'ConsDetails.dart'; // Assurez-vous d'importer votre écran de chat
 
-class Listrecons extends StatelessWidget {
+class Listrecons extends StatefulWidget {
   final String date;
   final String time;
   final String title;
+  final int idCons;
 
   const Listrecons(
-      {super.key, required this.date, required this.time, required this.title});
+      {super.key,
+      required this.date,
+      required this.time,
+      required this.title,
+      required this.idCons});
 
+  @override
+  _ListreconsState createState() => _ListreconsState();
+}
+
+class _ListreconsState extends State<Listrecons> {
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -22,7 +33,10 @@ class Listrecons extends StatelessWidget {
           Navigator.push(
             context,
             PageTransition(
-                type: PageTransitionType.fade, child: const Consdetails(showBottomAppBar: false),),
+              type: PageTransitionType.fade,
+              child:
+                  Consdetails(showBottomAppBar: false, idCons: widget.idCons),
+            ),
           );
         },
         child: Container(
@@ -60,7 +74,7 @@ class Listrecons extends StatelessWidget {
                     children: [
                       /// ✅ **Titre de la consultation**
                       Text(
-                        title,
+                        widget.title,
                         style: const TextStyle(
                           fontSize: 18.0,
                           fontWeight: FontWeight.bold,
@@ -82,7 +96,7 @@ class Listrecons extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          date,
+                          widget.date,
                           style: GoogleFonts.poppins(
                               fontSize: 14.sp,
                               fontWeight: FontWeight.w600,
@@ -99,7 +113,7 @@ class Listrecons extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          time,
+                          widget.time,
                           style: GoogleFonts.poppins(
                               fontSize: 14.sp,
                               fontWeight: FontWeight.w600,
@@ -109,7 +123,6 @@ class Listrecons extends StatelessWidget {
                     ],
                   ),
                 ),
-
               ),
             ],
           ),
