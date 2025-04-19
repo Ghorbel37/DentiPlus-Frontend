@@ -203,6 +203,7 @@ class _SheduleCardState extends State<ConsCard> {
   }
 
   void showNoteValDialog(BuildContext context) {
+    final TextEditingController noteController = TextEditingController();
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -243,6 +244,7 @@ class _SheduleCardState extends State<ConsCard> {
                 ),
                 SizedBox(height: 16),
                 TextField(
+                  controller: noteController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -252,14 +254,22 @@ class _SheduleCardState extends State<ConsCard> {
                     fillColor: Colors.grey[100],
                     hintText: 'Écrivez ici...',
                   ),
-                  maxLines: 5,
+                  maxLines: 7,
                 ),
                 SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
+                        final provider = Provider.of<DoctorConsultationsProvider>(
+                          context,
+                          listen: false,
+                        );
+                        await provider.validateConsultation(
+                          widget.idCons,
+                          noteController.text.trim(),
+                        );
                         Navigator.pop(context);
                       },
                       style: ElevatedButton.styleFrom(
@@ -293,6 +303,7 @@ class _SheduleCardState extends State<ConsCard> {
   }
 
   void showNoteREDialog(BuildContext context) {
+    final TextEditingController noteController = TextEditingController();
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -335,6 +346,7 @@ class _SheduleCardState extends State<ConsCard> {
                 ),
                 SizedBox(height: 16),
                 TextField(
+                  controller: noteController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -351,7 +363,15 @@ class _SheduleCardState extends State<ConsCard> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
+                        final provider = Provider.of<DoctorConsultationsProvider>(
+                          context,
+                          listen: false,
+                        );
+                        await provider.markReCons(
+                          widget.idCons,
+                          noteController.text.trim(),
+                        );
                         Navigator.pop(context);
                       },
                       style: ElevatedButton.styleFrom(

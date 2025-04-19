@@ -58,8 +58,8 @@ class _ConsultationsCardState extends State<ConsultationCard>
               itemBuilder: (context, index) {
                 final cons = encoreList[index];
                 // Assuming Consultation has fields patientName and dateTime
-                provider.fetchUserById(cons.patientId!);
-                final patientName = provider.patient?.name ?? 'Patient';
+                final patient = provider.getPatient(cons.patientId!);
+                final patientName = patient?.name ?? 'Patient';
                 final dateTime = cons.date ?? DateTime.now();
                 return ConsCard(
                   mainText: patientName,

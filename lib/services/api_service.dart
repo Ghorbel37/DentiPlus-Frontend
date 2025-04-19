@@ -323,32 +323,70 @@ class ApiService {
     throw Exception('No consultations found for etat $etat');
   }
 
-  Future<Consultation> validateConsultation(
+  Future<Diagmodal> validateConsultation(
       int consultationId, String doctorNote) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access_token') ?? '';
     final url = Uri.parse(Config.validateConsultationUrl(consultationId));
+
     final response = await http.post(
       url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'doctor_note': doctorNote}),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({ 'doctor_note': doctorNote }),
     );
-    if (response.statusCode == 200) {
-      return Consultation.fromJson(jsonDecode(response.body));
+
+    // ** DEBUG LOGGING **
+    print('✅ validateConsultation status: ${response.statusCode}');
+    print('📦 validateConsultation body: ${response.body}');
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      if (response.body.isNotEmpty) {
+        return Diagmodal.fromJson(jsonDecode(response.body));
+      }
+      // no body: return minimal successful model
+      return Diagmodal(id: consultationId, doctorNote: doctorNote);
     }
-    throw Exception('Failed to validate consultation');
+
+    // surface the real error:
+    throw Exception(
+        'validateConsultation failed (${response.statusCode}): ${response.body}'
+    );
   }
 
-  Future<Consultation> markReconsultation(
+
+  Future<Diagmodal> markReconsultation(
       int consultationId, String doctorNote) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access_token') ?? '';
+
     final url = Uri.parse(Config.reconsultationUrl(consultationId));
     final response = await http.post(
       url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'doctor_note': doctorNote}),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        'doctor_note': doctorNote,
+      }),
     );
-    if (response.statusCode == 200) {
-      return Consultation.fromJson(jsonDecode(response.body));
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      if (response.body.isNotEmpty) {
+        return Diagmodal.fromJson(jsonDecode(response.body));
+      }
+      // no body: return minimal successful model
+      return Diagmodal(id: consultationId, doctorNote: doctorNote);
     }
-    throw Exception('Failed to mark consultation for reconsultation');
+
+    // surface the real error:
+    throw Exception(
+        'ReConsultation failed (${response.statusCode}): ${response.body}'
+    );
   }
 
   // --------------------
