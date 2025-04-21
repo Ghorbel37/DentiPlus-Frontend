@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:denti_plus/Screens/Views/appointment.dart';
 import 'package:denti_plus/Screens/Views/find_doctor.dart';
 import 'package:denti_plus/Screens/Widgets/date_select.dart';
@@ -7,12 +8,21 @@ import 'package:denti_plus/Screens/Widgets/doctorList.dart';
 import 'package:denti_plus/Screens/Widgets/list_doctor1.dart';
 import 'package:denti_plus/Screens/Widgets/time_select.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../../providers/appointment_provider.dart';
 import 'Homepage.dart';
 
 class DoctorDetails extends StatefulWidget {
-  const DoctorDetails({super.key});
+  final bool isUpdateMode;
+  final int? appointmentId;
+
+  const DoctorDetails({
+    super.key,
+    this.isUpdateMode = false,
+    this.appointmentId,
+  });
 
   @override
   _DoctorDetailsState createState() => _DoctorDetailsState();
@@ -22,15 +32,69 @@ class _DoctorDetailsState extends State<DoctorDetails> {
   bool showExtendedText = false;
   String? selectedDate;
   String? selectedTime;
+  late List<DateTime> weekDates;
+  DateTime _selectedDateTime = DateTime.now();
+  List<TimeOfDay> _timeSlots = [];
+  final List<String> _timeStrings = [
+    '09:00 AM',
+    '10:00 AM',
+    '11:00 AM',
+    '01:00 PM',
+    '02:00 PM',
+    '03:00 PM',
+    '04:00 PM',
+    '05:00 PM',
+    '06:00 PM',
+    '07:00 PM',
+    '08:00 PM',
+    '09:00 PM'
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeTimeSlots();
+    // Fetch initial unavailable times
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context
+          .read<AppointmentProvider>()
+          .fetchUnavailableTimes(_selectedDateTime);
+    });
+  }
+
+  void _initializeTimeSlots() {
+    _timeSlots = _timeStrings.map((str) {
+      final timeParts = str.split(' ');
+      final numbers = timeParts[0].split(':');
+      int hour = int.parse(numbers[0]);
+      final minute = int.parse(numbers[1]);
+      if (timeParts[1] == 'PM' && hour != 12) hour += 12;
+      return TimeOfDay(hour: hour, minute: minute);
+    }).toList();
+  }
 
   void toggleTextVisibility() {
     setState(() {
       showExtendedText = !showExtendedText;
     });
   }
+
   void onDateSelected(String date) {
+    // Pass full ISO date string instead of just day number
+    final selectedDay = weekDates.firstWhere((d) => d.day.toString() == date);
     setState(() {
-      selectedDate = date;
+      _selectedDateTime = selectedDay;
+      selectedDate =
+          DateFormat('yyyy-MM-dd').format(selectedDay); // Format full date
+    });
+
+    // Fetch unavailable times for selected date
+    context.read<AppointmentProvider>().fetchUnavailableTimes(selectedDay);
+    // Refresh unavailable times when date changes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context
+          .read<AppointmentProvider>()
+          .fetchUnavailableTimes(_selectedDateTime);
     });
   }
 
@@ -40,8 +104,188 @@ class _DoctorDetailsState extends State<DoctorDetails> {
     });
   }
 
+  List<DateTime> getNextWeekDates(BuildContext context) {
+    final DateTime currentDate = DateTime.now();
+    final int firstDayOfWeekIndex =
+        MaterialLocalizations.of(context).firstDayOfWeekIndex;
+    final int targetWeekday =
+        firstDayOfWeekIndex == 0 ? 7 : firstDayOfWeekIndex;
+    final int currentWeekday = currentDate.weekday;
+
+    // Find the start of the NEXT week
+    int daysToAdd = (targetWeekday - currentWeekday + 7) % 7;
+    DateTime startOfNextWeek = currentDate.add(Duration(days: daysToAdd));
+
+    // Generate the next 7 days
+    return List.generate(
+        7, (index) => startOfNextWeek.add(Duration(days: index)));
+  }
+
+  // Modified time selection grid
+  Widget _buildTimeGrid() {
+    final unavailableTimes =
+        context.watch<AppointmentProvider>().unavailableTimes;
+
+    return Column(
+      children: [
+        const Divider(color: Colors.black12, thickness: 1),
+        const SizedBox(height: 20),
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: _timeSlots.map((time) {
+            final timeStr = _formatTime(time);
+            final slotDateTime = DateTime(
+              _selectedDateTime.year,
+              _selectedDateTime.month,
+              _selectedDateTime.day,
+              time.hour,
+              time.minute,
+            );
+
+            final isUnavailable = unavailableTimes
+                .any((slot) => slot.startTime.isAtSameMomentAs(slotDateTime));
+
+            return time_select(
+              mainText: timeStr,
+              onSelect: isUnavailable ? null : onTimeSelected,
+              isAvailable: !isUnavailable,
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  String _formatTime(TimeOfDay time) {
+    final hour = time.hourOfPeriod;
+    final minute = time.minute.toString().padLeft(2, '0');
+    final period = time.period == DayPeriod.am ? 'AM' : 'PM';
+    return '$hour:$minute $period';
+  }
+
+  void _handleUpdateAppointment() async {
+    if (selectedDate == null || selectedTime == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text("Veuillez sélectionner une date et une heure")),
+      );
+      return;
+    }
+
+    try {
+      final formattedDate = _parseSelectedDateTime();
+
+      await context.read<AppointmentProvider>().changeAppointmentTime(
+        widget.appointmentId!,
+        {'dateAppointment': formattedDate.toIso8601String()},
+      );
+
+      showSuccessDialog(context);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    }
+  }
+
+  DateTime _parseSelectedDateTime() {
+    // Parse date from "yyyy-MM-dd" format
+    final dateParts = selectedDate!.split('-');
+    final year = int.parse(dateParts[0]);
+    final month = int.parse(dateParts[1]);
+    final day = int.parse(dateParts[2]);
+
+    // Parse time from "hh:mm a" format
+    final timeParts = selectedTime!.split(' ');
+    final hourMinute = timeParts[0].split(':');
+    int hour = int.parse(hourMinute[0]);
+    final minute = int.parse(hourMinute[1]);
+
+    // Convert to 24-hour format
+    if (timeParts[1] == 'PM' && hour != 12) {
+      hour += 12;
+    } else if (timeParts[1] == 'AM' && hour == 12) {
+      hour = 0;
+    }
+
+    // Create combined DateTime in local timezone
+    final localDateTime = DateTime(year, month, day, hour, minute);
+
+    // Convert to UTC before sending to backend
+    return localDateTime.toUtc();
+  }
+
+  void _handleNewAppointment() {
+    Navigator.pushReplacement(
+      context,
+      PageTransition(
+        type: PageTransitionType.rightToLeft,
+        child: appointment(
+          selectedDate: selectedDate!,
+          selectedTime: selectedTime!,
+        ),
+      ),
+    );
+  }
+
+  void showSuccessDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        Future.delayed(const Duration(seconds: 2), () {
+          Navigator.of(context).pop(); // Close dialog
+          Navigator.of(context).pop(); // Return to previous screen
+        });
+
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    shape: BoxShape.circle,
+                  ),
+                  child: Image.asset(
+                    'assets/done_24px.png', // Update with your actual image path
+                    width: 60,
+                    height: 60,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  "Rendez-vous\nmis à jour",
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    weekDates = getNextWeekDates(context);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -124,19 +368,20 @@ class _DoctorDetailsState extends State<DoctorDetails> {
               const SizedBox(height: 20),
               SizedBox(
                 height: MediaQuery.of(context).size.height * 0.11,
-                child: ListView(
+                child: ListView.builder(
                   physics: const BouncingScrollPhysics(),
                   scrollDirection: Axis.horizontal,
-                  children: [
-                    date_Select(date: "21", maintext: "Lun", onSelect: onDateSelected),
-                    date_Select(date: "22", maintext: "Mar", onSelect: onDateSelected),
-                    date_Select(date: "23", maintext: "Mer", onSelect: onDateSelected),
-                    date_Select(date: "24", maintext: "Jeu", onSelect: onDateSelected),
-                    date_Select(date: "25", maintext: "Ven", onSelect: onDateSelected),
-                    date_Select(date: "26", maintext: "Sam", onSelect: onDateSelected),
-                    date_Select(date: "27", maintext: "Dim", onSelect: onDateSelected),
-                    date_Select(date: "28", maintext: "Lun", onSelect: onDateSelected),
-                  ],
+                  itemCount: weekDates.length,
+                  itemBuilder: (context, index) {
+                    DateTime date = weekDates[index];
+                    String dayAbbreviation = DateFormat('E', 'fr').format(date);
+                    String dayNumber = DateFormat('d').format(date);
+                    return date_Select(
+                      date: dayNumber,
+                      maintext: dayAbbreviation,
+                      onSelect: onDateSelected,
+                    );
+                  },
                 ),
               ),
               const SizedBox(height: 20),
@@ -144,35 +389,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
               const SizedBox(height: 20),
 
               // Time selection grid
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Column(
-                    children: [
-                      time_select(mainText: "09:00 AM", onSelect: onTimeSelected),
-                      time_select(mainText: "01:00 PM", onSelect: onTimeSelected),
-                      time_select(mainText: "04:00 PM", onSelect: onTimeSelected),
-                      time_select(mainText: "07:00 PM", onSelect: onTimeSelected),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      time_select(mainText: "10:00 AM", onSelect: onTimeSelected),
-                      time_select(mainText: "02:00 PM", onSelect: onTimeSelected),
-                      time_select(mainText: "05:00 PM", onSelect: onTimeSelected),
-                      time_select(mainText: "08:00 PM", onSelect: onTimeSelected),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      time_select(mainText: "11:00 AM", onSelect: onTimeSelected),
-                      time_select(mainText: "03:00 PM", onSelect: onTimeSelected),
-                      time_select(mainText: "06:00 PM", onSelect: onTimeSelected),
-                      time_select(mainText: "09:00 PM", onSelect: onTimeSelected),
-                    ],
-                  ),
-                ],
-              ),
+              _buildTimeGrid(),
               const SizedBox(height: 100), // Space for bottom bar
             ],
           ),
@@ -200,16 +417,11 @@ class _DoctorDetailsState extends State<DoctorDetails> {
               ),
               GestureDetector(
                 onTap: () {
-                  Navigator.pushReplacement(
-                    context,
-                    PageTransition(
-                      type: PageTransitionType.rightToLeft,
-                      child: appointment(
-                        selectedDate: selectedDate!,
-                        selectedTime: selectedTime!, // Pass the selected time
-                      ),
-                    ),
-                  );
+                  if (widget.isUpdateMode) {
+                    _handleUpdateAppointment();
+                  } else {
+                    _handleNewAppointment();
+                  }
                 },
                 child: Container(
                   height: 60,
@@ -220,7 +432,9 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                   ),
                   child: Center(
                     child: Text(
-                      "Payer Rendez-Vous",
+                      widget.isUpdateMode
+                          ? "Mettre à jour RDV"
+                          : "Payer Rendez-Vous",
                       style: GoogleFonts.poppins(
                         fontSize: 15.sp,
                         color: Colors.white,

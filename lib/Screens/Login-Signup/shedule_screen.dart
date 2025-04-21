@@ -114,8 +114,8 @@ class _TabBarExampleState extends State<shedule_screen>
                     Expanded(
                         child: TabBarView(
                             controller: tabController,
-                            children: const [
-                          shedule_tab1(),
+                            children: [
+                          ScheduleTab1(),
                           shedule_tab2(),
                           shedule_tab2(),
                         ]))

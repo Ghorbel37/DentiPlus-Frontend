@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 
 class time_select extends StatefulWidget {
   final String mainText;
-  final Function(String) onSelect;
+  final Function(String)? onSelect;
+  final bool isAvailable;
 
-  time_select({required this.mainText, required this.onSelect});
+  const time_select({
+    required this.mainText,
+    this.onSelect,
+    this.isAvailable = true,
+  });
 
   @override
   _time_selectState createState() => _time_selectState();
@@ -14,38 +19,39 @@ class _time_selectState extends State<time_select> {
   bool isSelected = false;
 
   void toggleSelection() {
-    setState(() {
-      isSelected = !isSelected;
-    });
-    widget.onSelect(widget.mainText);
+    if (!widget.isAvailable) return;
+
+    setState(() => isSelected = !isSelected);
+    widget.onSelect?.call(widget.mainText);
   }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: toggleSelection,
-      child: Container(
-        height: MediaQuery.of(context).size.height * 0.05,
-        width: MediaQuery.of(context).size.width * 0.2700,
-        decoration: BoxDecoration(
-          color: isSelected
-              ? const Color.fromARGB(255, 2, 179, 149)
-              : Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.black12),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
+      onTap: widget.isAvailable ? toggleSelection : null,
+      child: Opacity(
+        opacity: widget.isAvailable ? 1 : 0.5,
+        child: Container(
+          height: MediaQuery.of(context).size.height * 0.05,
+          width: MediaQuery.of(context).size.width * 0.2700,
+          decoration: BoxDecoration(
+            color: isSelected
+                ? const Color.fromARGB(255, 2, 179, 149)
+                : Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: widget.isAvailable ? Colors.black12 : Colors.red,
+            ),
+          ),
+          child: Center(
+            child: Text(
               widget.mainText,
               style: TextStyle(
-                  color: isSelected
-                      ? Colors.white
-                      : Color.fromARGB(255, 85, 85, 85),
-                  fontWeight: FontWeight.w500),
+                color: isSelected ? Colors.white : const Color.fromARGB(255, 85, 85, 85),
+                fontWeight: FontWeight.w500,
+              ),
             ),
-          ],
+          ),
         ),
       ),
     );

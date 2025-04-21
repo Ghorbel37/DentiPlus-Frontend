@@ -23,7 +23,7 @@ class Config {
 
   // Consultation (Patient)
   static const String consultationPatientUrl = '$baseUrl/consultation-patient/';
-  static const String createConsultationUrl = '$consultationPatientUrl';
+  static const String createConsultationUrl = consultationPatientUrl;
   static String addChatMessageUrl(int consultationId) =>
       '$consultationPatientUrl$consultationId/messages';
   static String getConsultationUrl(int consultationId) =>
@@ -34,8 +34,14 @@ class Config {
       '$consultationPatientUrl$consultationId/chat';
   static String finishConsultationUrl(int consultationId) =>
       '$consultationPatientUrl$consultationId/finish';
+  static String get patientAppointmentsUrl => "${consultationPatientUrl}appointments";
   static String addAppointmentUrl(int consultationId) =>
       '$consultationPatientUrl$consultationId/appointments';
+  static String changeAppointmentTimeUrl(int appointmentId) =>
+      '${consultationPatientUrl}appointments/$appointmentId/time';
+  static String cancelAppointmentUrl(int appointmentId) =>
+      '${consultationPatientUrl}appointments/$appointmentId/cancel';
+  static String get unavailableTimesUrl => '${consultationPatientUrl}unavailable-times';
 
   // Diagnostics
   static const String diagnosticsUrl = '$baseUrl/diagnostics';

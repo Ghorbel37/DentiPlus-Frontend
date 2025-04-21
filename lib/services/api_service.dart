@@ -5,8 +5,10 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:denti_plus/modals/patientCreateModal.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../modals/TimeSlot.dart';
 import '../modals/diagModal.dart';
 import 'config.dart';
 
@@ -184,11 +186,11 @@ class ApiService {
   // DOCTOR ENDPOINTS
   // --------------------
 
-  Future<Doctor> fetchDoctor(int id) async {
+  Future<PatientCreate> fetchDoctor(int id) async {
     final url = Uri.parse(Config.getDoctorByIdUrl(id));
     final response = await http.get(url);
     if (response.statusCode == 200) {
-      return Doctor.fromJson(jsonDecode(response.body));
+      return PatientCreate.fromJson(jsonDecode(response.body));
     }
     throw Exception('Failed to load doctor');
   }
@@ -472,6 +474,27 @@ class ApiService {
     }
     return [];
   }
+  Future<List<Consultation>> getConsultationsByEtat(String etat) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access_token') ?? '';
+
+    final url = Uri.parse('${Config.baseUrl}/consultation-patient/by-etat/$etat');
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      return data.map((e) => Consultation.fromJson(e)).toList();
+    }
+
+    throw Exception('Failed to fetch consultations: ${response.statusCode}');
+  }
 
   Future<String> sendChatMessage(
       int consultationId, Map<String, dynamic> chatData) async {
@@ -506,18 +529,98 @@ class ApiService {
     throw Exception('Failed to finish consultation chat');
   }
 
+  Future<List<Appointment>> getPatientAppointments() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access_token') ?? '';
+
+    final url = Uri.parse(Config.patientAppointmentsUrl);
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      return data.map((json) => Appointment.fromJson(json)).toList();
+    }
+
+    throw Exception('Failed to fetch appointments: ${response.statusCode} - ${response.body}');
+  }
+
   Future<Appointment> addAppointment(
       int consultationId, Map<String, dynamic> appointmentData) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access_token') ?? '';
+
     final url = Uri.parse(Config.addAppointmentUrl(consultationId));
     final response = await http.post(
       url,
-      headers: {'Content-Type': 'application/json'},
+      headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $token',},
       body: jsonEncode(appointmentData),
     );
     if (response.statusCode == 200 || response.statusCode == 201) {
       return Appointment.fromJson(jsonDecode(response.body));
     }
     throw Exception('Failed to add appointment');
+  }
+
+  Future<Appointment> changeAppointmentTime(
+      int appointmentId, Map<String, dynamic> appointmentData) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access_token') ?? '';
+
+    final url = Uri.parse(Config.changeAppointmentTimeUrl(appointmentId));
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $token'},
+      body: jsonEncode(appointmentData),
+    );
+    if (response.statusCode == 200) {
+      return Appointment.fromJson(jsonDecode(response.body));
+    }
+    throw Exception('Failed to change appointment time: ${response.body}');
+  }
+
+  // New method to cancel appointment
+  Future<Appointment> cancelAppointment(int appointmentId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access_token') ?? '';
+
+    final url = Uri.parse(Config.cancelAppointmentUrl(appointmentId));
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $token'},
+    );
+    if (response.statusCode == 200) {
+      return Appointment.fromJson(jsonDecode(response.body));
+    }
+    throw Exception('Failed to cancel appointment: ${response.body}');
+  }
+
+  // New method to get unavailable times
+  Future<List<TimeSlot>> getUnavailableTimes(DateTime date) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access_token') ?? '';
+
+    final url = Uri.parse(Config.unavailableTimesUrl);
+    // Format date to match backend expectation
+    final formattedDate = DateFormat('yyyy-MM-dd').format(date);
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $token'},
+      body: jsonEncode({'date': formattedDate }),
+    );
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      return (data['unavailable_times'] as List)
+          .map((e) => TimeSlot.fromJson(e))
+          .toList();
+    }
+    throw Exception('Failed to get unavailable times: ${response.body}');
   }
 
   Future<List<Consultation>> getPatientConsultations() async {

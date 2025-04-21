@@ -10,15 +10,16 @@ import '../../modals/appointmentModal.dart';
 import '../../modals/doctorModal.dart';
 import '../../providers/appointment_provider.dart';
 import '../../services/api_service.dart';
+import '../Widgets/shedule_annule_card.dart';
 
-class ScheduleTab1 extends StatefulWidget {
-  const ScheduleTab1({super.key,});
+class ScheduleTab3 extends StatefulWidget {
+  const ScheduleTab3({super.key,});
 
   @override
-  State<ScheduleTab1> createState() => _ScheduleTab1State();
+  State<ScheduleTab3> createState() => _ScheduleTab1State();
 }
 
-class _ScheduleTab1State extends State<ScheduleTab1> {
+class _ScheduleTab1State extends State<ScheduleTab3> {
   final ApiService _apiService = ApiService();
   final Map<int, PatientCreate> _doctorCache = {};
 
@@ -55,7 +56,7 @@ class _ScheduleTab1State extends State<ScheduleTab1> {
 
   @override
   Widget build(BuildContext context) {
-    final appointments = context.watch<AppointmentProvider>().plannedAppointments;
+    final appointments = context.watch<AppointmentProvider>().canceledAppointments;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -73,7 +74,7 @@ class _ScheduleTab1State extends State<ScheduleTab1> {
 
               return Padding(
                 padding: const EdgeInsets.only(bottom: 20),
-                child: shedule_card(
+                child: shedule_annule_card(
                   appointment: appointment,
                   doctor: doctor,
                   date: _formatDate(appointment.dateAppointment!),

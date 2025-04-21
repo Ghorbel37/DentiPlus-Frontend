@@ -11,7 +11,7 @@ import '../../modals/doctorModal.dart';
 import '../../providers/appointment_provider.dart';
 import '../Views/doctor_details_screen.dart';
 
-class shedule_card extends StatefulWidget {
+class shedule_annule_card extends StatefulWidget {
   final Appointment appointment;
   final PatientCreate? doctor;
   final String date;
@@ -20,7 +20,7 @@ class shedule_card extends StatefulWidget {
   final VoidCallback onCancel;
 
 
-  const shedule_card({
+  const shedule_annule_card({
     super.key,
     required this.appointment,
     required this.doctor,
@@ -31,10 +31,10 @@ class shedule_card extends StatefulWidget {
   });
 
   @override
-  _SheduleCardState createState() => _SheduleCardState();
+  _SheduleAnnuleCardState createState() => _SheduleAnnuleCardState();
 }
 
-class _SheduleCardState extends State<shedule_card> {
+class _SheduleAnnuleCardState extends State<shedule_annule_card> {
   bool isCancelled = false; // Variable pour gérer l'état du rendez-vous
 
   @override
@@ -45,7 +45,7 @@ class _SheduleCardState extends State<shedule_card> {
 
     return Center(
       child: Container(
-        height: MediaQuery.of(context).size.height * 0.19,
+        height: MediaQuery.of(context).size.height * 0.12,
         width: MediaQuery.of(context).size.width * 0.9,
         decoration: BoxDecoration(
           color: Colors.white,
@@ -143,7 +143,7 @@ class _SheduleCardState extends State<shedule_card> {
                 ],
               ),
             ),
-            Padding(
+            /*Padding(
               padding: const EdgeInsets.all(15),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -178,8 +178,7 @@ class _SheduleCardState extends State<shedule_card> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => DoctorDetails(isUpdateMode: true,
-                            appointmentId: widget.appointment.id,),
+                          builder: (context) => DoctorDetails(),
                         ),
                       );
                     },
@@ -204,7 +203,7 @@ class _SheduleCardState extends State<shedule_card> {
                   ),
                 ],
               ),
-            ),
+            ),*/
           ],
         ),
       ),

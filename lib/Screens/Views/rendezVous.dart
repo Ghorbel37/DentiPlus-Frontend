@@ -1,3 +1,4 @@
+import 'package:denti_plus/Screens/Views/shedule_tab3.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:denti_plus/Screens/Views/shedule_tab1.dart';
@@ -22,15 +23,6 @@ class Rendezvous extends StatefulWidget {
 class _TabBarExampleState extends State<Rendezvous>
     with SingleTickerProviderStateMixin {
   late TabController tabController;
-
-  // Liste de données pour les cartes de consultation
-  final List<Map<String, String>> consultationData = [
-    {'date': '26/06/2022', 'time': '10:30 AM', 'title': 'Consultation 3'},
-    {'date': '27/06/2022', 'time': '11:00 AM', 'title': 'Consultation 4'},
-    {'date': '28/06/2022', 'time': '12:00 PM', 'title': 'Consultation 5'},
-    {'date': '28/06/2022', 'time': '12:00 PM', 'title': 'Consultation 5'},
-    {'date': '28/06/2022', 'time': '12:00 PM', 'title': 'Consultation 5'},
-  ];
 
   @override
   void initState() {
@@ -149,9 +141,9 @@ class _TabBarExampleState extends State<Rendezvous>
                         child: TabBarView(
                             controller: tabController,
                             children: const [
-                          shedule_tab1(),
+                          ScheduleTab1(),
                           shedule_tab2(),
-                          shedule_tab2(),
+                          ScheduleTab3(),
                         ]))
                   ],
                 ),
@@ -172,7 +164,7 @@ class _TabBarExampleState extends State<Rendezvous>
           );
         },
         backgroundColor: const Color.fromARGB(255, 254, 92, 92),
-        child:Icon(Icons.add_box, color: Colors.white),
+        child: Icon(Icons.add_box, color: Colors.white),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );

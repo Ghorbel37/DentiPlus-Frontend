@@ -1,4 +1,5 @@
 import 'package:denti_plus/Screens/Widgets/RootWrapper.dart';
+import 'package:denti_plus/providers/appointment_provider.dart';
 import 'package:denti_plus/providers/chat_provider.dart';
 import 'package:denti_plus/providers/conversation_provider.dart';
 import 'package:denti_plus/providers/doctor_consultations_provider.dart';
@@ -6,6 +7,8 @@ import 'package:denti_plus/providers/patient_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
 
 // Screens
 import 'package:denti_plus/Screens/Views/Screen1.dart';
@@ -33,11 +36,20 @@ class DentiPlus extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ConversationProvider()),
         ChangeNotifierProvider(create: (_) => ChatProvider()),
         ChangeNotifierProvider(create: (_) => DoctorConsultationsProvider()),
+        ChangeNotifierProvider(create: (_) => AppointmentProvider()),
       ],
       child: ResponsiveSizer(
         builder: (context, orientation, screenType) {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('fr'), // French locale
+            ],
             home: FutureBuilder(
               future: _initializeApp(context),
               builder: (context, snapshot) {
