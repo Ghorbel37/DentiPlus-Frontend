@@ -294,6 +294,7 @@ class _appointmentState extends State<Consdetails> {
   }
 
   void showNoteValDialog(BuildContext context) {
+    final TextEditingController noteController = TextEditingController();
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -334,6 +335,7 @@ class _appointmentState extends State<Consdetails> {
                 ),
                 SizedBox(height: 16),
                 TextField(
+                  controller: noteController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -343,14 +345,22 @@ class _appointmentState extends State<Consdetails> {
                     fillColor: Colors.grey[100],
                     hintText: 'Écrivez ici...',
                   ),
-                  maxLines: 5,
+                  maxLines: 7,
                 ),
                 SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
+                        final provider = Provider.of<DoctorConsultationsProvider>(
+                          context,
+                          listen: false,
+                        );
+                        await provider.validateConsultation(
+                          widget.idCons,
+                          noteController.text.trim(),
+                        );
                         Navigator.pop(context);
                       },
                       style: ElevatedButton.styleFrom(
@@ -384,6 +394,7 @@ class _appointmentState extends State<Consdetails> {
   }
 
   void showNoteREDialog(BuildContext context) {
+    final TextEditingController noteController = TextEditingController();
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -426,6 +437,7 @@ class _appointmentState extends State<Consdetails> {
                 ),
                 SizedBox(height: 16),
                 TextField(
+                  controller: noteController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -442,7 +454,15 @@ class _appointmentState extends State<Consdetails> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
+                        final provider = Provider.of<DoctorConsultationsProvider>(
+                          context,
+                          listen: false,
+                        );
+                        await provider.markReCons(
+                          widget.idCons,
+                          noteController.text.trim(),
+                        );
                         Navigator.pop(context);
                       },
                       style: ElevatedButton.styleFrom(

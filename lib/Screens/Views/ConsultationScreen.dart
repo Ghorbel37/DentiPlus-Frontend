@@ -27,15 +27,6 @@ class _ConsultationscreenState extends State<Consultationscreen>
     with SingleTickerProviderStateMixin {
   late TabController tabController;
 
-  // Liste de données pour les cartes de consultation
-  final List<Map<String, String>> consultationData = [
-    {'date': '26/06/2022', 'time': '10:30 AM', 'title': 'Consultation 3'},
-    {'date': '27/06/2022', 'time': '11:00 AM', 'title': 'Consultation 4'},
-    {'date': '28/06/2022', 'time': '12:00 PM', 'title': 'Consultation 5'},
-    {'date': '28/06/2022', 'time': '12:00 PM', 'title': 'Consultation 5'},
-    {'date': '28/06/2022', 'time': '12:00 PM', 'title': 'Consultation 5'},
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -88,9 +79,7 @@ class _ConsultationscreenState extends State<Consultationscreen>
           return const Center(child: CircularProgressIndicator());
         }
         if (consultationProvider.errorMessage != null) {
-          return Center(
-              child: Text(consultationProvider.errorMessage!,
-                  style: const TextStyle(color: Colors.red)));
+          return const shedule_tab2();
         }
         return Column(
                     children: [
@@ -142,7 +131,7 @@ class _ConsultationscreenState extends State<Consultationscreen>
                                         child: Tab(text: "Encore"),
                                       ),
                                       Expanded(
-                                        child: Tab(text: "Validé"),
+                                        child: Tab(text: "Vérifié"),
                                       ),
                                     ],
                                   ),

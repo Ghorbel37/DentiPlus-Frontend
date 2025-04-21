@@ -23,9 +23,12 @@ class ConsultationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Determine the color of the side bar based on etat.
-    Color sideBarColor = const Color.fromARGB(255, 3, 190, 150);
+    Color sideBarColor = Colors.black45;
     if (etat.toString().contains("RECONSULTATION")) {
       sideBarColor = Colors.red;
+    }
+    if (etat.toString().contains("VALIDE")) {
+      sideBarColor = const Color.fromARGB(255, 3, 190, 150);
     }
     return Center(
         child: Container(

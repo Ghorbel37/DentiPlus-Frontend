@@ -4,6 +4,7 @@ import '../modals/TimeSlot.dart';
 import '../modals/appointmentModal.dart';
 import '../modals/consultationModal.dart';
 import '../modals/enums.dart';
+import '../modals/patientCreateModal.dart';
 
 class AppointmentProvider with ChangeNotifier {
   final ApiService _apiService = ApiService();
@@ -14,6 +15,7 @@ class AppointmentProvider with ChangeNotifier {
   Appointment? _currentAppointment;
   bool _isLoading = false;
   String? _errorMessage;
+  PatientCreate? _doctor;
 
   // Direct list access (now mutable)
   List<Appointment> get appointments => _appointments;
@@ -156,10 +158,22 @@ class AppointmentProvider with ChangeNotifier {
 
       _canceledAppointments = appointments.where((a) =>
       a.etat == EtatAppointment.ANNULE).toList();
+
+      _doctor= await fetchDoctor();
     } catch (e) {
       _handleError(e);
     } finally {
       _stopLoading();
+    }
+  }
+
+  Future<PatientCreate?> fetchDoctor() async {
+    try {
+      final doctor = await _apiService.fetchDoctor(2);
+      return doctor;
+    } catch (e) {
+      print('Error fetching doctor: $e');
+      return null;
     }
   }
 }

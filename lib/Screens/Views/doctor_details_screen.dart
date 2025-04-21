@@ -1,3 +1,4 @@
+import 'package:denti_plus/modals/patientCreateModal.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -29,6 +30,7 @@ class DoctorDetails extends StatefulWidget {
 }
 
 class _DoctorDetailsState extends State<DoctorDetails> {
+  late Future<PatientCreate?> _doctorFuture;
   bool showExtendedText = false;
   String? selectedDate;
   String? selectedTime;
@@ -54,6 +56,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
   void initState() {
     super.initState();
     _initializeTimeSlots();
+    _doctorFuture = _fetchDoctor();
     // Fetch initial unavailable times
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context
@@ -259,7 +262,8 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                     shape: BoxShape.circle,
                   ),
                   child: Image.asset(
-                    'assets/done_24px.png', // Update with your actual image path
+                    'assets/done_24px.png',
+                    // Update with your actual image path
                     width: 60,
                     height: 60,
                   ),
@@ -283,171 +287,192 @@ class _DoctorDetailsState extends State<DoctorDetails> {
     );
   }
 
+  Future<PatientCreate?> _fetchDoctor() async {
+    try {
+      return await Provider.of<AppointmentProvider>(context, listen: false)
+          .fetchDoctor();
+    } catch (e) {
+      print('Error fetching doctor: $e');
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     weekDates = getNextWeekDates(context);
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Container(
-            height: 10,
-            width: 10,
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage("lib/icons/back1.png"),
+    return FutureBuilder<PatientCreate?>(
+        future: _doctorFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+          final doctor = snapshot.data!;
+          return Scaffold(
+            backgroundColor: Colors.white,
+            appBar: AppBar(
+              leading: GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  height: 10,
+                  width: 10,
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage("lib/icons/back1.png"),
+                    ),
+                  ),
+                ),
               ),
+              title: Text(
+                "Trouver RDV",
+                style: GoogleFonts.poppins(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 18.sp,
+                ),
+              ),
+              centerTitle: true,
+              elevation: 0,
+              toolbarHeight: 100,
+              backgroundColor: Colors.white,
             ),
-          ),
-        ),
-        title: Text(
-          "Trouver RDV",
-          style: GoogleFonts.poppins(
-            color: Colors.black,
-            fontWeight: FontWeight.w700,
-            fontSize: 18.sp,
-          ),
-        ),
-        centerTitle: true,
-        elevation: 0,
-        toolbarHeight: 100,
-        backgroundColor: Colors.white,
-      ),
 
-      // Body with scrollable content
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 10),
-              doctorList(
-                distance: "loin 800m",
-                image: "lib/icons/male-doctor.png",
-                maintext: "Dr. Marcus Horizon",
-                numRating: "4.7",
-                subtext: "Dentiste",
-              ),
-              const SizedBox(height: 15),
-              GestureDetector(
-                onTap: toggleTextVisibility,
+            // Body with scrollable content
+            body: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      "A propos",
-                      style: GoogleFonts.poppins(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w500,
+                    const SizedBox(height: 10),
+                    doctorList(
+                      distance: "loin 800m",
+                      image:doctor.profilePhoto ??"lib/icons/male-doctor.png",
+                      maintext: 'Dr.${doctor.name}' ?? "Dr. Unknown",
+                      numRating: "4.7",
+                      subtext: "Dentiste",
+                    ),
+                    const SizedBox(height: 15),
+                    GestureDetector(
+                      onTap: toggleTextVisibility,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "A propos",
+                            style: GoogleFonts.poppins(
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            showExtendedText
+                                ? "Dentiste à l'écoute et empathique, je crois en l'importance d'une relation de confiance avec mes patients.\nExpert en dentisterie moderne, je maîtrise les techniques les plus avancées et les technologies de pointe pour diagnostiquer et traiter efficacement diverses affections bucco-dentaires. Mon objectif est de fournir des soins personnalisés et confortables."
+                                : "Dentiste à l'écoute et empathique, je crois en l'importance d'une relation de confiance avec mes patients.",
+                            style: GoogleFonts.poppins(
+                              color: const Color.fromARGB(255, 37, 37, 37),
+                              fontSize: 14.sp,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            showExtendedText ? "Lire moins" : "Lire plus",
+                            style: const TextStyle(
+                              color: Color.fromARGB(255, 1, 128, 111),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 5),
-                    Text(
-                      showExtendedText
-                          ? "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod elipss this is just a dummy text..."
-                          : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod elipss this is just a dummy text ...",
-                      style: GoogleFonts.poppins(
-                        color: const Color.fromARGB(255, 37, 37, 37),
-                        fontSize: 14.sp,
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.11,
+                      child: ListView.builder(
+                        physics: const BouncingScrollPhysics(),
+                        scrollDirection: Axis.horizontal,
+                        itemCount: weekDates.length,
+                        itemBuilder: (context, index) {
+                          DateTime date = weekDates[index];
+                          String dayAbbreviation =
+                              DateFormat('E', 'fr').format(date);
+                          String dayNumber = DateFormat('d').format(date);
+                          return date_Select(
+                            date: dayNumber,
+                            maintext: dayAbbreviation,
+                            onSelect: onDateSelected,
+                          );
+                        },
                       ),
                     ),
-                    const SizedBox(height: 5),
-                    Text(
-                      showExtendedText ? "Lire moins" : "Lire plus",
-                      style: TextStyle(
-                        color: const Color.fromARGB(255, 1, 128, 111),
+                    //const SizedBox(height: 20),
+
+                    // Time selection grid
+                    _buildTimeGrid(),
+                    const SizedBox(height: 10), // Space for bottom bar
+                  ],
+                ),
+              ),
+            ),
+
+            // Bottom navigation bar
+            bottomNavigationBar: BottomAppBar(
+              shape: const CircularNotchedRectangle(),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 40, vertical: 5),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      height: 50,
+                      width: 50,
+                      decoration: BoxDecoration(
+                        color: const Color.fromARGB(255, 247, 247, 247),
+                        borderRadius: BorderRadius.circular(18),
+                        image: const DecorationImage(
+                          image: AssetImage("lib/icons/Chat.png"),
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        if (widget.isUpdateMode) {
+                          _handleUpdateAppointment();
+                        } else {
+                          _handleNewAppointment();
+                        }
+                      },
+                      child: Container(
+                        height: 60,
+                        width: 200,
+                        decoration: BoxDecoration(
+                          color: const Color.fromARGB(255, 2, 179, 149),
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: Center(
+                          child: Text(
+                            widget.isUpdateMode
+                                ? "Mettre à jour RDV"
+                                : "Payer Rendez-Vous",
+                            style: GoogleFonts.poppins(
+                              fontSize: 15.sp,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.11,
-                child: ListView.builder(
-                  physics: const BouncingScrollPhysics(),
-                  scrollDirection: Axis.horizontal,
-                  itemCount: weekDates.length,
-                  itemBuilder: (context, index) {
-                    DateTime date = weekDates[index];
-                    String dayAbbreviation = DateFormat('E', 'fr').format(date);
-                    String dayNumber = DateFormat('d').format(date);
-                    return date_Select(
-                      date: dayNumber,
-                      maintext: dayAbbreviation,
-                      onSelect: onDateSelected,
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(height: 20),
-              const Divider(color: Colors.black12, thickness: 1),
-              const SizedBox(height: 20),
-
-              // Time selection grid
-              _buildTimeGrid(),
-              const SizedBox(height: 100), // Space for bottom bar
-            ],
-          ),
-        ),
-      ),
-
-      // Bottom navigation bar
-      bottomNavigationBar: BottomAppBar(
-        shape: const CircularNotchedRectangle(),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 5),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                height: 50,
-                width: 50,
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 247, 247, 247),
-                  borderRadius: BorderRadius.circular(18),
-                  image: const DecorationImage(
-                    image: AssetImage("lib/icons/Chat.png"),
-                  ),
-                ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  if (widget.isUpdateMode) {
-                    _handleUpdateAppointment();
-                  } else {
-                    _handleNewAppointment();
-                  }
-                },
-                child: Container(
-                  height: 60,
-                  width: 200,
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 2, 179, 149),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: Center(
-                    child: Text(
-                      widget.isUpdateMode
-                          ? "Mettre à jour RDV"
-                          : "Payer Rendez-Vous",
-                      style: GoogleFonts.poppins(
-                        fontSize: 15.sp,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+            ),
+          );
+        });
   }
 }

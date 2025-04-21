@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../../modals/consultationModal.dart';
+import '../../providers/conversation_provider.dart';
 import '../Views/chat_screen.dart';
 
 class BannerWidget extends StatelessWidget {
@@ -36,14 +39,32 @@ class BannerWidget extends StatelessWidget {
                   ),
                   SizedBox(height: 1.5.h),
                   ElevatedButton(
-                    onPressed: () {
-                      // Navigate to the conversation screen or start a new chat
-                      /*Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ChatScreen(), // Replace with your actual chat screen
-                        ),
-                      );*/
+                    onPressed: () async {
+                      try {
+                        // Create a new consultation via the provider.
+                        final consultationProvider =
+                            Provider.of<ConversationProvider>(context,
+                                listen: false);
+                        Consultation newConsultation =
+                            await consultationProvider.createNewConsultation();
+
+                        // Once created, navigate to the ChatScreen.
+                        // You can pass the new consultation object (or its id) to the ChatScreen.
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                ChatScreen(consultation: newConsultation),
+                          ),
+                        ).then((_) {
+                          consultationProvider.fetchConsultations();
+                        });
+                      } catch (e) {
+                        // Optionally show an error message if creation fails.
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(e.toString())),
+                        );
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF048A6D),

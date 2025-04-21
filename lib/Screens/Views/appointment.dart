@@ -1,3 +1,4 @@
+import 'package:denti_plus/modals/patientCreateModal.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -15,7 +16,7 @@ class appointment extends StatefulWidget {
   final String selectedTime;
 
   const appointment(
-      {super.key, required this.selectedDate, required this.selectedTime});
+      {super.key, required this.selectedDate, required this.selectedTime,});
 
   @override
   State<appointment> createState() => _appointmentState();
@@ -27,11 +28,23 @@ class _appointmentState extends State<appointment> {
   Consultation? _selectedConsultation;
   List<Consultation> _reconsultations = [];
   bool _loadingConsultations = true;
+  late Future<PatientCreate?> _doctorFuture;
 
   @override
   void initState() {
     super.initState();
+    _doctorFuture = _fetchDoctor();
     _fetchReconsultations();
+  }
+
+  Future<PatientCreate?> _fetchDoctor() async {
+    try {
+      return await Provider.of<AppointmentProvider>(context, listen: false)
+          .fetchDoctor();
+    } catch (e) {
+      print('Error fetching doctor: $e');
+      return null;
+    }
   }
 
   Future<void> _fetchReconsultations() async {
@@ -80,7 +93,7 @@ class _appointmentState extends State<appointment> {
       showSuccessDialog(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
+        SnackBar(content: Text("Déja tu as un rendez-vous pour cette consultation !")),
       );
     }
   }
@@ -114,142 +127,157 @@ class _appointmentState extends State<appointment> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.pushReplacement(
-              context,
-              PageTransition(
-                  type: PageTransitionType.fade, child: DoctorDetails()),
-            );
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Image.asset("lib/icons/back1.png", height: 24, width: 24),
-          ),
-        ),
-        title: Text(
-          "Top Doctors",
-          style: GoogleFonts.poppins(color: Colors.black, fontSize: 18.sp),
-        ),
-        centerTitle: true,
-        elevation: 0,
-        toolbarHeight: 70,
+    return FutureBuilder<PatientCreate?>(
+        future: _doctorFuture,
+        builder: (context, snapshot)
+    {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return const Center(child: CircularProgressIndicator());
+      }
+      if (snapshot.hasError) {
+        return Center(child: Text('Error: ${snapshot.error}'));
+      }
+      final doctor = snapshot.data!;
+      return Scaffold(
         backgroundColor: Colors.white,
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  doctorList(
-                    distance: "800m away",
-                    image: "lib/icons/male-doctor.png",
-                    maintext: "Dr. Marcus Horizon",
-                    numRating: "4.7",
-                    subtext: "Cardiologist",
-                  ),
-                  SizedBox(height: 15),
-                  _buildConsultationDropdown(),
-                  SizedBox(height: 10),
-
-                  // ** Date & Time Selection **
-                  buildSectionTitle("Date"),
-                  buildDetailRow("lib/icons/callender.png",
-                      "${widget.selectedDate} | ${widget.selectedTime}"),
-
-                  // ** Reason Selection **
-                  SizedBox(height: 15),
-                  buildSectionTitle("Reason"),
-                  buildDetailRow("lib/icons/pencil.png", "Chest pain"),
-
-                  // ** Payment Details **
-                  SizedBox(height: 20),
-                  buildSectionTitle("Payment Details"),
-                  buildPaymentRow("Consultation", "\$60"),
-                  buildPaymentRow("Admin Fee", "\$1.00"),
-                  buildPaymentRow("Additional Discount", "-"),
-                  Divider(color: Colors.black12, thickness: 1),
-                  buildPaymentRow("Total", "\$61.00", isTotal: true),
-
-                  // ** Payment Method Selection with Dropdown **
-                  SizedBox(height: 20),
-                  Text("Payment Method",
-                      style: GoogleFonts.poppins(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black87)),
-                  SizedBox(height: 10),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 15),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.black12),
-                      borderRadius: BorderRadius.circular(12),
+        appBar: AppBar(
+          leading: GestureDetector(
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                PageTransition(
+                    type: PageTransitionType.fade, child: DoctorDetails()),
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Image.asset("lib/icons/back1.png", height: 24, width: 24),
+            ),
+          ),
+          title: Text(
+            "Top Doctors",
+            style: GoogleFonts.poppins(color: Colors.black, fontSize: 18.sp),
+          ),
+          centerTitle: true,
+          elevation: 0,
+          toolbarHeight: 70,
+          backgroundColor: Colors.white,
+        ),
+        body: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    doctorList(
+                      distance: "800m away",
+                      image: "lib/icons/male-doctor.png",
+                      maintext: 'Dr.${doctor.name}' ?? "Dr. Unknown",
+                      numRating: "4.7",
+                      subtext: "Cardiologist",
                     ),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        value: _selectedPaymentMethod,
-                        isExpanded: true,
-                        icon: const Padding(
-                          padding: EdgeInsets.only(right: 10),
-                          // Fix icon misalignment
-                          child: Icon(Icons.credit_card, color: Colors.black54),
+                    SizedBox(height: 15),
+                    _buildConsultationDropdown(),
+                    SizedBox(height: 10),
+
+                    // ** Date & Time Selection **
+                    buildSectionTitle("Date"),
+                    buildDetailRow("lib/icons/callender.png",
+                        "${widget.selectedDate} | ${widget.selectedTime}"),
+
+                    // ** Reason Selection **
+                    /*SizedBox(height: 15),
+                    buildSectionTitle("Reason"),
+                    buildDetailRow("lib/icons/pencil.png", "Chest pain"),*/
+
+                    // ** Payment Details **
+                    SizedBox(height: 20),
+                    buildSectionTitle("Détails de paiement"),
+                    buildPaymentRow("Consultation", "\$60"),
+                    buildPaymentRow("frais additionnels", "\$5.00"),
+                    buildPaymentRow("Remise supplémentaire", "-"),
+                    Divider(color: Colors.black12, thickness: 1),
+                    buildPaymentRow("Totale", "\$65.00", isTotal: true),
+
+                    // ** Payment Method Selection with Dropdown **
+                    SizedBox(height: 20),
+                    Text("Methode de paiement",
+                        style: GoogleFonts.poppins(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black87)),
+                    SizedBox(height: 10),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 15),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black12),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: _selectedPaymentMethod,
+                          isExpanded: true,
+                          icon: const Padding(
+                            padding: EdgeInsets.only(right: 10),
+                            // Fix icon misalignment
+                            child: Icon(
+                                Icons.credit_card, color: Colors.black54),
+                          ),
+                          items: _paymentMethods.map((method) {
+                            return DropdownMenuItem(
+                              value: method,
+                              child: Text(method,
+                                  style: GoogleFonts.poppins(
+                                      fontSize: 15.sp, color: Colors.black87)),
+                            );
+                          }).toList(),
+                          onChanged: (newValue) {
+                            setState(() {
+                              _selectedPaymentMethod = newValue!;
+                            });
+                          },
                         ),
-                        items: _paymentMethods.map((method) {
-                          return DropdownMenuItem(
-                            value: method,
-                            child: Text(method,
-                                style: GoogleFonts.poppins(
-                                    fontSize: 15.sp, color: Colors.black87)),
-                          );
-                        }).toList(),
-                        onChanged: (newValue) {
-                          setState(() {
-                            _selectedPaymentMethod = newValue!;
-                          });
-                        },
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
 
-          // ** Fixed Booking Button at Bottom **
-          SafeArea(
-            child: GestureDetector(
-              onTap: _bookAppointment,
-              child: Container(
-                width: double.infinity,
-                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                height: 50,
-                decoration: BoxDecoration(
-                  color: Color.fromARGB(255, 2, 179, 149),
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: Center(
-                  child: context.watch<AppointmentProvider>().isLoading
-                      ? CircularProgressIndicator(color: Colors.white)
-                      : Text(
-                          "Book Appointment",
-                          style: GoogleFonts.poppins(
-                              fontSize: 16.sp,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600),
-                        ),
+            // ** Fixed Booking Button at Bottom **
+            SafeArea(
+              child: GestureDetector(
+                onTap: _bookAppointment,
+                child: Container(
+                  width: double.infinity,
+                  margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: Color.fromARGB(255, 2, 179, 149),
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: Center(
+                    child: context
+                        .watch<AppointmentProvider>()
+                        .isLoading
+                        ? CircularProgressIndicator(color: Colors.white)
+                        : Text(
+                      "Book Appointment",
+                      style: GoogleFonts.poppins(
+                          fontSize: 16.sp,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600),
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
+    });
   }
 
   // Helper Function for Titles
@@ -332,7 +360,7 @@ class _appointmentState extends State<appointment> {
       return Padding(
         padding: const EdgeInsets.only(top: 10),
         child: Text(
-          "No RECONSULTATION consultations available",
+          "Pas de RECONSULTATION",
           style: GoogleFonts.poppins(color: Colors.red),
         ),
       );
@@ -342,10 +370,10 @@ class _appointmentState extends State<appointment> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(height: 20),
-        Text("Select Consultation",
+        Text("Choisir consultation",
             style: GoogleFonts.poppins(
                 fontSize: 16.sp,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w700,
                 color: Colors.black87)),
         SizedBox(height: 10),
         Container(

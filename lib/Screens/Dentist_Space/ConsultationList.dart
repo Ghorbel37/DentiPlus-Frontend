@@ -1,19 +1,14 @@
 import 'package:denti_plus/Screens/Dentist_Space/Consultation_Card.dart';
 import 'package:denti_plus/Screens/Dentist_Space/Listrecons.dart';
+import 'package:denti_plus/Screens/Views/shedule_tab2.dart';
 import 'package:denti_plus/providers/doctor_consultations_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:denti_plus/Screens/Views/shedule_tab1.dart';
-import 'package:denti_plus/Screens/Views/shedule_tab2.dart';
-import 'package:denti_plus/Screens/Widgets/TabbarPages/tab1.dart';
-import 'package:denti_plus/Screens/Widgets/TabbarPages/tab2.dart';
-import 'package:denti_plus/Screens/Login-Signup/login.dart';
 import 'package:intl/intl.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
-import '../Views/doctor_details_screen.dart';
+
 import 'ConsDetails.dart';
 import 'Listvalide.dart';
 
@@ -74,9 +69,8 @@ class _TabBarExampleState extends State<Consultationlist>
       body: Consumer<DoctorConsultationsProvider>(
           builder: (context, provider, child) {
         if (provider.errorMessage != null) {
-          return Center(
-              child: Text(provider.errorMessage!,
-                  style: const TextStyle(color: Colors.red)));
+          return const Center(
+              child: shedule_tab2());
         }
         return Column(
           children: [
@@ -142,71 +136,81 @@ class _TabBarExampleState extends State<Consultationlist>
               child: TabBarView(
                 controller: tabController,
                 children: [
+                  // First tab (Encore) - Keep existing ConsultationCard
                   ConsultationCard(),
-                  // First tab: "ENCORE" consultations.
-                  // Inside your TabBarView’s first ListView.builder (Encore):
-                  ListView.builder(
-                    itemCount: provider.valideConsultations.length,
-                    itemBuilder: (context, index) {
-                      final consultation = provider.valideConsultations[index];
-                      final dt = consultation.date!;
-                      final formattedDate = DateFormat('dd/MM/yyyy').format(dt);
-                      final formattedTime = DateFormat('hh:mm a').format(dt);
 
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => Consdetails(
-                                showBottomAppBar: true,
-                                idCons: consultation.id!,
-                              ),
+                  // Second tab (Validée)
+                  Consumer<DoctorConsultationsProvider>(
+                    builder: (context, provider, _) {
+                      if (provider.valideConsultations.isEmpty) {
+                        return shedule_tab2();
+                      }
+                      return ListView.builder(
+                        itemCount: provider.valideConsultations.length,
+                        itemBuilder: (context, index) {
+                          final consultation = provider.valideConsultations[index];
+                          final dt = consultation.date!;
+                          final formattedDate = DateFormat('dd/MM/yyyy').format(dt);
+                          final formattedTime = DateFormat('hh:mm a').format(dt);
+
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => Consdetails(
+                                    showBottomAppBar: true,
+                                    idCons: consultation.id!,
+                                  ),
+                                ),
+                              ).then((_) => provider.fetchConsultations());
+                            },
+                            child: Listvalide(
+                              idCons: consultation.id!,
+                              date: formattedDate,
+                              time: formattedTime,
+                              title: "Consultation ${consultation.id!}",
                             ),
-                          ).then((_) {
-                            provider.fetchConsultations();
-                          });
+                          );
                         },
-                        child: Listvalide(
-                          idCons: consultation.id!,
-                          date: formattedDate,
-                          time: formattedTime,
-                          title: "Consultation ${consultation.id!}",
-                        ),
                       );
                     },
                   ),
 
-                  // Second tab: "VALIDÉ" consultations.
-                  // And likewise for the Validé tab:
-                  ListView.builder(
-                    itemCount: provider.reConsultations.length,
-                    itemBuilder: (context, index) {
-                      final consultation = provider.reConsultations[index];
-                      final dt = consultation.date!;
-                      final formattedDate = DateFormat('dd/MM/yyyy').format(dt);
-                      final formattedTime = DateFormat('hh:mm a').format(dt);
+                  // Third tab (Re-Cons)
+                  Consumer<DoctorConsultationsProvider>(
+                    builder: (context, provider, _) {
+                      if (provider.reConsultations.isEmpty) {
+                        return shedule_tab2();
+                      }
+                      return ListView.builder(
+                        itemCount: provider.reConsultations.length,
+                        itemBuilder: (context, index) {
+                          final consultation = provider.reConsultations[index];
+                          final dt = consultation.date!;
+                          final formattedDate = DateFormat('dd/MM/yyyy').format(dt);
+                          final formattedTime = DateFormat('hh:mm a').format(dt);
 
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => Consdetails(
-                                showBottomAppBar: true,
-                                idCons: consultation.id!,
-                              ),
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => Consdetails(
+                                    showBottomAppBar: true,
+                                    idCons: consultation.id!,
+                                  ),
+                                ),
+                              ).then((_) => provider.fetchConsultations());
+                            },
+                            child: Listrecons(
+                              idCons: consultation.id!,
+                              date: formattedDate,
+                              time: formattedTime,
+                              title: "Consultation ${consultation.id!}",
                             ),
-                          ).then((_) {
-                            provider.fetchConsultations();
-                          });
+                          );
                         },
-                        child: Listrecons(
-                          idCons: consultation.id!,
-                          date: formattedDate,
-                          time: formattedTime,
-                          title: "Consultation ${consultation.id!}",
-                        ),
                       );
                     },
                   ),

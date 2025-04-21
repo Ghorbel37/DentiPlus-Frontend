@@ -1,3 +1,4 @@
+import 'package:denti_plus/Screens/Views/shedule_tab2.dart';
 import 'package:denti_plus/modals/patientCreateModal.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -33,21 +34,15 @@ class _ConsultationsCardState extends State<ConsultationCard>
         child: Consumer<DoctorConsultationsProvider>(
           builder: (context, provider, _) {
             if (provider.errorMessage != null) {
-              return Center(
-                child: Text(
-                  provider.errorMessage!,
-                  style: GoogleFonts.openSans(color: Colors.red),
-                ),
+              return const Center(
+                child: shedule_tab2()
               );
             }
 
             final encoreList = provider.encoreConsultations;
             if (encoreList.isEmpty) {
-              return Center(
-                child: Text(
-                  'Aucune consultation trouvé',
-                  style: GoogleFonts.openSans(fontSize: 20.sp),
-                ),
+              return const Center(
+                child: shedule_tab2()
               );
             }
 

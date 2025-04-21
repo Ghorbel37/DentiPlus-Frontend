@@ -1,3 +1,4 @@
+import 'package:denti_plus/Screens/Views/shedule_tab2.dart';
 import 'package:denti_plus/modals/patientCreateModal.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -12,7 +13,9 @@ import '../../providers/appointment_provider.dart';
 import '../../services/api_service.dart';
 
 class ScheduleTab1 extends StatefulWidget {
-  const ScheduleTab1({super.key,});
+  const ScheduleTab1({
+    super.key,
+  });
 
   @override
   State<ScheduleTab1> createState() => _ScheduleTab1State();
@@ -30,7 +33,8 @@ class _ScheduleTab1State extends State<ScheduleTab1> {
     });
   }
 
-  Future<PatientCreate?> _getDoctorForAppointment(Appointment appointment) async {
+  Future<PatientCreate?> _getDoctorForAppointment(
+      Appointment appointment) async {
     if (_doctorCache.containsKey(appointment.consultationId)) {
       return _doctorCache[appointment.consultationId];
     }
@@ -55,39 +59,44 @@ class _ScheduleTab1State extends State<ScheduleTab1> {
 
   @override
   Widget build(BuildContext context) {
-    final appointments = context.watch<AppointmentProvider>().plannedAppointments;
+    final appointments =
+        context.watch<AppointmentProvider>().plannedAppointments;
 
     return Scaffold(
       backgroundColor: Colors.white,
       body: appointments.isEmpty
-          ? Center(child: Text("No appointments found", style: GoogleFonts.poppins()))
+          ? const Center(
+              child:
+                  shedule_tab2())
           : ListView.builder(
-        padding: const EdgeInsets.symmetric(vertical: 30),
-        itemCount: appointments.length,
-        itemBuilder: (context, index) {
-          final appointment = appointments[index];
-          return FutureBuilder<PatientCreate?>(
-            future: _getDoctorForAppointment(appointment),
-            builder: (context, snapshot) {
-              final doctor = snapshot.data;
+              padding: const EdgeInsets.symmetric(vertical: 30),
+              itemCount: appointments.length,
+              itemBuilder: (context, index) {
+                final appointment = appointments[index];
+                return FutureBuilder<PatientCreate?>(
+                  future: _getDoctorForAppointment(appointment),
+                  builder: (context, snapshot) {
+                    final doctor = snapshot.data;
 
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 20),
-                child: shedule_card(
-                  appointment: appointment,
-                  doctor: doctor,
-                  date: _formatDate(appointment.dateAppointment!),
-                  time: _formatTime(appointment.dateAppointment!),
-                  confirmation: appointment.etat.toString(),
-                  onCancel: () => _handleCancelAppointment(appointment.id!),
-                ),
-              );
-            },
-          );
-        },
-      ),
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 20),
+                      child: shedule_card(
+                        appointment: appointment,
+                        doctor: doctor,
+                        date: _formatDate(appointment.dateAppointment!),
+                        time: _formatTime(appointment.dateAppointment!),
+                        confirmation: appointment.etat.toString(),
+                        onCancel: () =>
+                            _handleCancelAppointment(appointment.id!),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
     );
   }
+
   void _handleCancelAppointment(int appointmentId) {
     context.read<AppointmentProvider>().cancelAppointment(appointmentId);
   }

@@ -1,3 +1,4 @@
+import 'package:denti_plus/modals/patientCreateModal.dart';
 import 'package:denti_plus/providers/chat_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -7,6 +8,7 @@ import 'package:provider/provider.dart';
 
 import '../../modals/consultationModal.dart';
 import '../../modals/enums.dart';
+import '../../providers/appointment_provider.dart';
 import '../../providers/conversation_provider.dart';
 import '../Widgets/chat_info.dart'; // updated name
 import '../Widgets/chat_doctor.dart';
@@ -23,6 +25,7 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   late TextEditingController _controller;
   late ChatProvider _chatProvider;
+  late Future<PatientCreate?> _doctorFuture;
 
   bool get isConsultationClosed {
     return widget.consultation.etat == EtatConsultation.VALIDE ||
@@ -36,6 +39,17 @@ class _ChatScreenState extends State<ChatScreen> {
     // Grab provider and fetch history
     _chatProvider = Provider.of<ChatProvider>(context, listen: false);
     _chatProvider.fetchChatHistory(widget.consultation.id!);
+    _doctorFuture = _fetchDoctor();
+  }
+
+  Future<PatientCreate?> _fetchDoctor() async {
+    try {
+      return Provider.of<AppointmentProvider>(context, listen: false)
+          .fetchDoctor();
+    } catch (e) {
+      print('Error fetching doctor: $e');
+      return null;
+    }
   }
 
   @override
@@ -52,13 +66,39 @@ class _ChatScreenState extends State<ChatScreen> {
           onPressed: () => Navigator.pop(context),
           icon: Image.asset("lib/icons/back1.png", height: 24, width: 24),
         ),
-        title: Text(
-          "Dr. Marcus Horizon",
-          style: GoogleFonts.poppins(
-            color: Colors.black,
-            fontWeight: FontWeight.w500,
-            fontSize: 17.sp,
-          ),
+        title: FutureBuilder<PatientCreate?>(
+          future: _doctorFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Text(
+                "Loading...",
+                style: GoogleFonts.poppins(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 17.sp,
+                ),
+              );
+            }
+            if (snapshot.hasError || !snapshot.hasData) {
+              return Text(
+                "Dr. Unknown",
+                style: GoogleFonts.poppins(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 17.sp,
+                ),
+              );
+            }
+            final doctor = snapshot.data!;
+            return Text(
+              'Dr.${doctor.name!}',
+              style: GoogleFonts.poppins(
+                color: Colors.black,
+                fontWeight: FontWeight.w500,
+                fontSize: 17.sp,
+              ),
+            );
+          },
         ),
         actions: [
           _appBarIcon("lib/icons/video_call.png"),
@@ -151,19 +191,17 @@ class _ChatScreenState extends State<ChatScreen> {
               const SizedBox(width: 10),
               IconButton(
                 icon: Icon(FontAwesomeIcons.telegram,
-                    color: isConsultationClosed
-                        ? Colors.grey
-                        : Colors.teal,
+                    color: isConsultationClosed ? Colors.grey : Colors.teal,
                     size: 40),
                 onPressed: isConsultationClosed || _chatProvider.isSending
                     ? null
                     : () {
-                  final text = _controller.text.trim();
-                  if (text.isEmpty) return;
-                  _chatProvider.sendMessage(
-                      widget.consultation.id!, text);
-                  _controller.clear();
-                },
+                        final text = _controller.text.trim();
+                        if (text.isEmpty) return;
+                        _chatProvider.sendMessage(
+                            widget.consultation.id!, text);
+                        _controller.clear();
+                      },
               ),
             ],
           ),
