@@ -179,7 +179,7 @@ class _SheduleCardState extends State<shedule_card> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => DoctorDetails(isUpdateMode: true,
-                            appointmentId: widget.appointment.id,),
+                            appointment: widget.appointment,),
                         ),
                       );
                     },

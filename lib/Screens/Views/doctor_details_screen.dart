@@ -1,3 +1,4 @@
+import 'package:denti_plus/modals/appointmentModal.dart';
 import 'package:denti_plus/modals/patientCreateModal.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,16 +14,18 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../providers/appointment_provider.dart';
+import '../../services/api_service.dart';
 import 'Homepage.dart';
 
 class DoctorDetails extends StatefulWidget {
   final bool isUpdateMode;
-  final int? appointmentId;
+  final Appointment? appointment;
+
 
   const DoctorDetails({
     super.key,
     this.isUpdateMode = false,
-    this.appointmentId,
+    this.appointment,
   });
 
   @override
@@ -31,6 +34,7 @@ class DoctorDetails extends StatefulWidget {
 
 class _DoctorDetailsState extends State<DoctorDetails> {
   late Future<PatientCreate?> _doctorFuture;
+  final ApiService _apiService = ApiService();
   bool showExtendedText = false;
   String? selectedDate;
   String? selectedTime;
@@ -180,7 +184,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
       final formattedDate = _parseSelectedDateTime();
 
       await context.read<AppointmentProvider>().changeAppointmentTime(
-        widget.appointmentId!,
+        widget.appointment!.id!,
         {'dateAppointment': formattedDate.toIso8601String()},
       );
 
@@ -289,8 +293,17 @@ class _DoctorDetailsState extends State<DoctorDetails> {
 
   Future<PatientCreate?> _fetchDoctor() async {
     try {
+    if (!widget.isUpdateMode || widget.appointment == null) {
       return await Provider.of<AppointmentProvider>(context, listen: false)
-          .fetchDoctor();
+        .fetchDoctor();
+    }
+
+      final consultation = await _apiService.getConsultation(widget.appointment!.consultationId!);
+      if (consultation.doctorId == null) return null;
+
+      final doctor = await Provider.of<AppointmentProvider>(context, listen: false)
+          .fetchDoctorById(consultation.doctorId!);
+      return doctor;
     } catch (e) {
       print('Error fetching doctor: $e');
       return null;
