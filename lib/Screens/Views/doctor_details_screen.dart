@@ -223,7 +223,9 @@ class _DoctorDetailsState extends State<DoctorDetails> {
     return localDateTime.toUtc();
   }
 
-  void _handleNewAppointment() {
+  void _handleNewAppointment() async{
+    final doctor = await _doctorFuture;
+
     Navigator.pushReplacement(
       context,
       PageTransition(
@@ -231,6 +233,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
         child: appointment(
           selectedDate: selectedDate!,
           selectedTime: selectedTime!,
+          doctor: doctor,
         ),
       ),
     );

@@ -14,9 +14,10 @@ import '../../providers/appointment_provider.dart';
 class appointment extends StatefulWidget {
   final String selectedDate;
   final String selectedTime;
+  final PatientCreate? doctor;
 
   const appointment(
-      {super.key, required this.selectedDate, required this.selectedTime,});
+      {super.key, required this.selectedDate, required this.selectedTime, required this.doctor});
 
   @override
   State<appointment> createState() => _appointmentState();
@@ -28,23 +29,11 @@ class _appointmentState extends State<appointment> {
   Consultation? _selectedConsultation;
   List<Consultation> _reconsultations = [];
   bool _loadingConsultations = true;
-  late Future<PatientCreate?> _doctorFuture;
 
   @override
   void initState() {
     super.initState();
-    _doctorFuture = _fetchDoctor();
     _fetchReconsultations();
-  }
-
-  Future<PatientCreate?> _fetchDoctor() async {
-    try {
-      return await Provider.of<AppointmentProvider>(context, listen: false)
-          .fetchDoctor();
-    } catch (e) {
-      print('Error fetching doctor: $e');
-      return null;
-    }
   }
 
   Future<void> _fetchReconsultations() async {
@@ -127,18 +116,8 @@ class _appointmentState extends State<appointment> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<PatientCreate?>(
-        future: _doctorFuture,
-        builder: (context, snapshot)
-    {
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        return const Center(child: CircularProgressIndicator());
-      }
-      if (snapshot.hasError) {
-        return Center(child: Text('Error: ${snapshot.error}'));
-      }
-      final doctor = snapshot.data!;
-      return Scaffold(
+    final doctor = widget.doctor;
+    return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
           leading: GestureDetector(
@@ -155,8 +134,12 @@ class _appointmentState extends State<appointment> {
             ),
           ),
           title: Text(
-            "Top Doctors",
-            style: GoogleFonts.poppins(color: Colors.black, fontSize: 18.sp),
+            "Planifier RDV",
+            style: GoogleFonts.poppins(
+              color: Colors.black,
+              fontWeight: FontWeight.w700,
+              fontSize: 18.sp,
+            ),
           ),
           centerTitle: true,
           elevation: 0,
@@ -174,7 +157,7 @@ class _appointmentState extends State<appointment> {
                     doctorList(
                       distance: "800m away",
                       image: "lib/icons/male-doctor.png",
-                      maintext: 'Dr.${doctor.name}' ?? "Dr. Unknown",
+                      maintext: 'Dr.${doctor?.name}' ?? "Dr. Unknown",
                       numRating: "4.7",
                       subtext: "Cardiologist",
                     ),
@@ -277,7 +260,6 @@ class _appointmentState extends State<appointment> {
           ],
         ),
       );
-    });
   }
 
   // Helper Function for Titles
