@@ -45,7 +45,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<PatientCreate?> _fetchDoctor() async {
     try {
       return Provider.of<AppointmentProvider>(context, listen: false)
-          .fetchDoctor();
+          .fetchDoctorById(widget.consultation.doctorId!);
     } catch (e) {
       print('Error fetching doctor: $e');
       return null;

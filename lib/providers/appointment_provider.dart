@@ -176,4 +176,14 @@ class AppointmentProvider with ChangeNotifier {
       return null;
     }
   }
+
+  Future<PatientCreate?> fetchDoctorById(int doctorId) async {
+    try {
+      final doctor = await _apiService.fetchDoctor(doctorIds);
+      return doctor;
+    } catch (e) {
+      print('Error fetching doctor: $e');
+      return null;
+    }
+  }
 }
