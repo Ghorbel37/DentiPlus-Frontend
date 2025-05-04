@@ -121,7 +121,7 @@ class _appointmentState extends State<Consdetails> {
                   SizedBox(height: 8),
                   Text(
                     consultation.doctorNote ??
-                        'Pas encore mentionner votre avis!',
+                        'Pas encore mentionné votre avis!',
                     style: GoogleFonts.poppins(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w300,
