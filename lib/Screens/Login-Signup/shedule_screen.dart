@@ -116,8 +116,8 @@ class _TabBarExampleState extends State<shedule_screen>
                             controller: tabController,
                             children: [
                           ScheduleTab1(),
-                          shedule_tab2(),
-                          shedule_tab2(),
+                          ScheduleTab2(),
+                          ScheduleTab2(),
                         ]))
                   ],
                 ),

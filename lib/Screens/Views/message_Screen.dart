@@ -114,8 +114,8 @@ class _TabBarExampleState extends State<message_screen>
                     ),
                     TabBarView(controller: tabController, children: const [
                       message_tab_all(),
-                      shedule_tab2(),
-                      shedule_tab2(),
+                      ScheduleTab2(),
+                      ScheduleTab2(),
                     ])
                   ],
                 ),

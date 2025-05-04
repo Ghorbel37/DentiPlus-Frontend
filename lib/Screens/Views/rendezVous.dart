@@ -142,7 +142,7 @@ class _TabBarExampleState extends State<Rendezvous>
                             controller: tabController,
                             children: const [
                           ScheduleTab1(),
-                          shedule_tab2(),
+                          ScheduleTab2(),
                           ScheduleTab3(),
                         ]))
                   ],
