@@ -1,4 +1,4 @@
-import 'package:denti_plus/Screens/Views/shedule_tab2.dart';
+import 'package:denti_plus/Screens/Views/schedule_empty.dart';
 import 'package:denti_plus/modals/patientCreateModal.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -68,7 +68,7 @@ class _ScheduleTab1State extends State<ScheduleTab1> {
       body: appointments.isEmpty
           ? const Center(
               child:
-                  shedule_tab2())
+                  ScheduleEmpty())
           : ListView.builder(
               padding: const EdgeInsets.symmetric(vertical: 30),
               itemCount: appointments.length,
