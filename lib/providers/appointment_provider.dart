@@ -179,7 +179,7 @@ class AppointmentProvider with ChangeNotifier {
 
   Future<PatientCreate?> fetchDoctorById(int doctorId) async {
     try {
-      final doctor = await _apiService.fetchDoctor(doctorIds);
+      final doctor = await _apiService.fetchDoctor(doctorId);
       return doctor;
     } catch (e) {
       print('Error fetching doctor: $e');
