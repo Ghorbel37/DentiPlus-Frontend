@@ -67,6 +67,7 @@ class Config {
 
   // Doctors
   static const String doctorsUrl = '$baseUrl/doctors';
+  static String getSingleDoctorUrl() => '$doctorsUrl/single-doctor';
   static String getDoctorByIdUrl(int id) => '$doctorsUrl/$id';
   static String getDoctorsByNameUrl(String name) => '$doctorsUrl/name/$name';
   // (For update, same URL as getting a doctor by id)

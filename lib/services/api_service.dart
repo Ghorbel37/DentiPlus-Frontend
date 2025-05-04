@@ -186,6 +186,25 @@ class ApiService {
   // DOCTOR ENDPOINTS
   // --------------------
 
+  Future<PatientCreate> fetchSingleDoctor() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access_token') ?? '';
+
+    final url = Uri.parse(Config.getSingleDoctorUrl());
+    final response = await http.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return PatientCreate.fromJson(jsonDecode(response.body));
+    }
+    throw Exception('Failed to load doctor');
+  }
+
   Future<PatientCreate> fetchDoctor(int id) async {
     final url = Uri.parse(Config.getDoctorByIdUrl(id));
     final response = await http.get(url);
