@@ -44,7 +44,13 @@ class _on_boardingState extends State<on_boarding> {
             children: [
               GestureDetector(
                   onTap: () {
-                    _controller.jumpToPage(2);
+                    Navigator.push(
+                        context,
+                        PageTransition(
+                            type: PageTransitionType.bottomToTop, // Adds smooth fade + slide effect
+                            duration: Duration(milliseconds: 800), // Adjust duration for smoothness
+                            curve: Curves.easeInOut, // Smooth transition
+                            child: const login_signup()));
                   },
                   child: Text(
                     "Passer",
