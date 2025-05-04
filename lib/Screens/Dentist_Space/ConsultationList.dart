@@ -1,6 +1,6 @@
 import 'package:denti_plus/Screens/Dentist_Space/Consultation_Card.dart';
 import 'package:denti_plus/Screens/Dentist_Space/Listrecons.dart';
-import 'package:denti_plus/Screens/Views/shedule_tab2.dart';
+import 'package:denti_plus/Screens/Views/schedule_empty.dart';
 import 'package:denti_plus/providers/doctor_consultations_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -70,7 +70,7 @@ class _TabBarExampleState extends State<Consultationlist>
           builder: (context, provider, child) {
         if (provider.errorMessage != null) {
           return const Center(
-              child: shedule_tab2());
+              child: ScheduleEmpty());
         }
         return Column(
           children: [
@@ -143,7 +143,7 @@ class _TabBarExampleState extends State<Consultationlist>
                   Consumer<DoctorConsultationsProvider>(
                     builder: (context, provider, _) {
                       if (provider.valideConsultations.isEmpty) {
-                        return shedule_tab2();
+                        return ScheduleEmpty();
                       }
                       return ListView.builder(
                         itemCount: provider.valideConsultations.length,
@@ -181,7 +181,7 @@ class _TabBarExampleState extends State<Consultationlist>
                   Consumer<DoctorConsultationsProvider>(
                     builder: (context, provider, _) {
                       if (provider.reConsultations.isEmpty) {
-                        return shedule_tab2();
+                        return ScheduleEmpty();
                       }
                       return ListView.builder(
                         itemCount: provider.reConsultations.length,

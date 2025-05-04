@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:denti_plus/Screens/Views/shedule_tab1.dart';
-import 'package:denti_plus/Screens/Views/shedule_tab2.dart';
+import 'package:denti_plus/Screens/Views/schedule_empty.dart';
 import 'package:denti_plus/Screens/Widgets/TabbarPages/tab1.dart';
 import 'package:denti_plus/Screens/Widgets/TabbarPages/tab2.dart';
 import 'package:denti_plus/Screens/Login-Signup/login.dart';
@@ -79,7 +79,7 @@ class _ConsultationscreenState extends State<Consultationscreen>
           return const Center(child: CircularProgressIndicator());
         }
         if (consultationProvider.errorMessage != null) {
-          return const shedule_tab2();
+          return const ScheduleEmpty();
         }
         return Column(
                     children: [
