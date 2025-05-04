@@ -9,9 +9,7 @@ import 'package:provider/provider.dart';
 import '../../modals/consultationModal.dart';
 import '../../modals/enums.dart';
 import '../../providers/appointment_provider.dart';
-import '../../providers/conversation_provider.dart';
-import '../Widgets/chat_info.dart'; // updated name
-import '../Widgets/chat_doctor.dart';
+import '../Widgets/chat_info.dart';
 
 class ChatScreen extends StatefulWidget {
   final Consultation consultation;
@@ -26,6 +24,9 @@ class _ChatScreenState extends State<ChatScreen> {
   late TextEditingController _controller;
   late ChatProvider _chatProvider;
   late Future<PatientCreate?> _doctorFuture;
+  late ScrollController _scrollController;
+  bool _showScrollToBottomButton = false;
+  int _lastMessageCount = 0;
 
   bool get isConsultationClosed {
     return widget.consultation.etat == EtatConsultation.VALIDE ||
@@ -36,10 +37,21 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
     _controller = TextEditingController();
-    // Grab provider and fetch history
+    _scrollController = ScrollController();
     _chatProvider = Provider.of<ChatProvider>(context, listen: false);
     _chatProvider.fetchChatHistory(widget.consultation.id!);
     _doctorFuture = _fetchDoctor();
+
+    // Listen to scroll position to show/hide FAB
+    _scrollController.addListener(() {
+      final isAtBottom = _scrollController.offset >=
+          _scrollController.position.maxScrollExtent - 10;
+      if (_showScrollToBottomButton != !isAtBottom) {
+        setState(() {
+          _showScrollToBottomButton = !isAtBottom;
+        });
+      }
+    });
   }
 
   Future<PatientCreate?> _fetchDoctor() async {
@@ -55,6 +67,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void dispose() {
     _controller.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -76,49 +89,58 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  /// Scroll to the bottom of the chat.
+  void _scrollToBottom() {
+    _scrollController.animateTo(
+      _scrollController.position.maxScrollExtent,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
+  }
+
   AppBar _buildAppBar() => AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        toolbarHeight: 100,
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: Image.asset("lib/icons/back1.png", height: 24, width: 24),
-        ),
-        title: FutureBuilder<PatientCreate?>(
-          future: _doctorFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Text(
-                "Loading...",
-                style: GoogleFonts.poppins(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 17.sp,
-                ),
-              );
-            }
-            if (snapshot.hasError || !snapshot.hasData) {
-              return Text(
-                "Dr. Unknown",
-                style: GoogleFonts.poppins(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 17.sp,
-                ),
-              );
-            }
-            final doctor = snapshot.data!;
-            return Text(
-              'Dr.${doctor.name!}',
-              style: GoogleFonts.poppins(
-                color: Colors.black,
-                fontWeight: FontWeight.w500,
-                fontSize: 17.sp,
-              ),
-            );
-          },
-        ),
-        actions: [
+    backgroundColor: Colors.white,
+    elevation: 0,
+    toolbarHeight: 100,
+    leading: IconButton(
+      onPressed: () => Navigator.pop(context),
+      icon: Image.asset("lib/icons/back1.png", height: 24, width: 24),
+    ),
+    title: FutureBuilder<PatientCreate?>(
+      future: _doctorFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Text(
+            "Loading...",
+            style: GoogleFonts.poppins(
+              color: Colors.black,
+              fontWeight: FontWeight.w500,
+              fontSize: 17.sp,
+            ),
+          );
+        }
+        if (snapshot.hasError || !snapshot.hasData) {
+          return Text(
+            "Dr. Unknown",
+            style: GoogleFonts.poppins(
+              color: Colors.black,
+              fontWeight: FontWeight.w500,
+              fontSize: 17.sp,
+            ),
+          );
+        }
+        final doctor = snapshot.data!;
+        return Text(
+          'Dr.${doctor.name!}',
+          style: GoogleFonts.poppins(
+            color: Colors.black,
+            fontWeight: FontWeight.w500,
+            fontSize: 17.sp,
+          ),
+        );
+      },
+    ),
+    actions: [
       Consumer<ChatProvider>(
         builder: (context, prov, child) {
           return Row(
@@ -127,24 +149,24 @@ class _ChatScreenState extends State<ChatScreen> {
                   !isConsultationClosed &&
                   !prov.isFinishing)
                 IconButton(
-                  icon: const Icon(FontAwesomeIcons.circleCheck,
+                  icon: const Icon(FontAwesomeIcons.checkCircle,
                       color: Colors.teal, size: 24),
                   onPressed: _handleFinishConversation,
                   tooltip: 'Finish Conversation',
                 ),
-          _appBarIcon("lib/icons/call.png"),
-          _appBarIcon("lib/icons/more.png"),
-        ],
-      );
+              _appBarIcon("lib/icons/call.png"),
+              _appBarIcon("lib/icons/more.png"),
+            ],
+          );
         },
       ),
     ],
   );
 
   Widget _appBarIcon(String path) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        child: Image.asset(path, height: 24, width: 24),
-      );
+    padding: const EdgeInsets.symmetric(horizontal: 8),
+    child: Image.asset(path, height: 24, width: 24),
+  );
 
   Widget _buildChatBubble(String message, bool isUser) {
     return Align(
@@ -230,12 +252,12 @@ class _ChatScreenState extends State<ChatScreen> {
                 onPressed: isConsultationClosed || _chatProvider.isSending
                     ? null
                     : () {
-                        final text = _controller.text.trim();
-                        if (text.isEmpty) return;
-                        _chatProvider.sendMessage(
-                            widget.consultation.id!, text);
-                        _controller.clear();
-                      },
+                  final text = _controller.text.trim();
+                  if (text.isEmpty) return;
+                  print('Sending message: $text');
+                  _chatProvider.sendMessage(widget.consultation.id!, text);
+                  _controller.clear();
+                },
               ),
             ],
           ),
@@ -251,6 +273,14 @@ class _ChatScreenState extends State<ChatScreen> {
       appBar: _buildAppBar(),
       body: Consumer<ChatProvider>(
         builder: (context, prov, child) {
+          // Auto-scroll to bottom when new messages are added
+          if (prov.chatHistory.length > _lastMessageCount) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _scrollToBottom();
+            });
+            _lastMessageCount = prov.chatHistory.length;
+          }
+
           if (prov.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
@@ -265,6 +295,7 @@ class _ChatScreenState extends State<ChatScreen> {
             children: [
               Expanded(
                 child: ListView.builder(
+                  controller: _scrollController,
                   padding: const EdgeInsets.all(18),
                   itemCount: prov.chatHistory.length + 1,
                   itemBuilder: (context, i) {
@@ -286,6 +317,33 @@ class _ChatScreenState extends State<ChatScreen> {
           );
         },
       ),
+      floatingActionButton: _showScrollToBottomButton
+          ? FloatingActionButton(
+        onPressed: _scrollToBottom,
+        backgroundColor: Colors.teal,
+        child: const Icon(FontAwesomeIcons.arrowDown, color: Colors.white),
+        mini: true,
+      )
+          : null,
+      floatingActionButtonLocation: _CustomFabLocation(),
     );
   }
+}
+
+/// Custom FAB location to position the button higher.
+class _CustomFabLocation extends FloatingActionButtonLocation {
+  @override
+  Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry) {
+    // Default end-bottom alignment
+    final double fabX = scaffoldGeometry.scaffoldSize.width - 16 - 40; // FAB width ~40
+    // Move up by 80 pixels to avoid overlap with send button
+    final double fabY = scaffoldGeometry.scaffoldSize.height -
+        scaffoldGeometry.floatingActionButtonSize.height -
+        16 -
+        80; // Adjusted upward
+    return Offset(fabX, fabY);
+  }
+
+  @override
+  String toString() => '_CustomFabLocation';
 }
