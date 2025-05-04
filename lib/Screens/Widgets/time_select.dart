@@ -1,36 +1,24 @@
 import 'package:flutter/material.dart';
 
-class time_select extends StatefulWidget {
+class time_select extends StatelessWidget {
   final String mainText;
   final Function(String)? onSelect;
   final bool isAvailable;
+  final bool isSelected;
 
   const time_select({
     required this.mainText,
     this.onSelect,
     this.isAvailable = true,
+    required this.isSelected,
   });
-
-  @override
-  _time_selectState createState() => _time_selectState();
-}
-
-class _time_selectState extends State<time_select> {
-  bool isSelected = false;
-
-  void toggleSelection() {
-    if (!widget.isAvailable) return;
-
-    setState(() => isSelected = !isSelected);
-    widget.onSelect?.call(widget.mainText);
-  }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: widget.isAvailable ? toggleSelection : null,
+      onTap: isAvailable ? () => onSelect?.call(mainText) : null,
       child: Opacity(
-        opacity: widget.isAvailable ? 1 : 0.5,
+        opacity: isAvailable ? 1 : 0.5,
         child: Container(
           height: MediaQuery.of(context).size.height * 0.05,
           width: MediaQuery.of(context).size.width * 0.2700,
@@ -40,12 +28,12 @@ class _time_selectState extends State<time_select> {
                 : Colors.white,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: widget.isAvailable ? Colors.black12 : Colors.red,
+              color: isAvailable ? Colors.black12 : Colors.red,
             ),
           ),
           child: Center(
             child: Text(
-              widget.mainText,
+              mainText,
               style: TextStyle(
                 color: isSelected ? Colors.white : const Color.fromARGB(255, 85, 85, 85),
                 fontWeight: FontWeight.w500,

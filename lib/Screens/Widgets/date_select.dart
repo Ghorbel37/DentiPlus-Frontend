@@ -1,32 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
-class date_Select extends StatefulWidget {
+class date_Select extends StatelessWidget {
+  final DateTime date;
   final String maintext;
-  final String date;
-  final Function(String) onSelect;
+  final Function(DateTime) onSelect;
+  final bool isSelected;
 
-  date_Select({required this.date, required this.maintext, required this.onSelect});
-
-  @override
-  _date_SelectState createState() => _date_SelectState();
-}
-
-class _date_SelectState extends State<date_Select> {
-  bool isSelected = false;
-
-  void toggleSelection() {
-    setState(() {
-      isSelected = !isSelected;
-    });
-    widget.onSelect(widget.date);
-  }
+  const date_Select({
+    required this.date,
+    required this.maintext,
+    required this.onSelect,
+    required this.isSelected,
+  });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: toggleSelection,
+      onTap: () => onSelect(date),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Container(
@@ -45,14 +38,14 @@ class _date_SelectState extends State<date_Select> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  widget.maintext,
+                  maintext,
                   style: GoogleFonts.poppins(
                     fontSize: 15.sp,
                     color: isSelected ? Colors.white : Colors.black54,
                   ),
                 ),
                 Text(
-                  widget.date,
+                  DateFormat('d').format(date),
                   style: GoogleFonts.inter(
                     fontSize: 18.sp,
                     color: isSelected

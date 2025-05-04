@@ -68,8 +68,6 @@ class _appointmentState extends State<appointment> {
 
     try {
       final formattedDate = _parseSelectedDateTime();
-      print('Final DateTime: ${formattedDate.toIso8601String()}');
-      print('Consultation ID: ${_selectedConsultation?.id}');
       // Verify the values
       print('Consultation ID: ${_selectedConsultation!.id}');
       print('Formatted Date: ${formattedDate.toIso8601String()}');
@@ -82,7 +80,7 @@ class _appointmentState extends State<appointment> {
       showSuccessDialog(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Déja tu as un rendez-vous pour cette consultation !")),
+        SnackBar(content: Text("Tu as déja un rendez-vous pour cette consultation !")),
       );
     }
   }
@@ -111,7 +109,7 @@ class _appointmentState extends State<appointment> {
     }
 
     // Create final DateTime in UTC
-    return DateTime(year, month, day, hour, minute).toUtc();
+    return DateTime(year, month, day, hour, minute);
   }
 
   @override

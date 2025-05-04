@@ -21,7 +21,6 @@ class DoctorDetails extends StatefulWidget {
   final bool isUpdateMode;
   final Appointment? appointment;
 
-
   const DoctorDetails({
     super.key,
     this.isUpdateMode = false,
@@ -61,7 +60,6 @@ class _DoctorDetailsState extends State<DoctorDetails> {
     super.initState();
     _initializeTimeSlots();
     _doctorFuture = _fetchDoctor();
-    // Fetch initial unavailable times
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context
           .read<AppointmentProvider>()
@@ -86,18 +84,16 @@ class _DoctorDetailsState extends State<DoctorDetails> {
     });
   }
 
-  void onDateSelected(String date) {
-    // Pass full ISO date string instead of just day number
-    final selectedDay = weekDates.firstWhere((d) => d.day.toString() == date);
+  // Updated to accept DateTime directly and reset selectedTime
+  void onDateSelected(DateTime selectedDay) {
     setState(() {
       _selectedDateTime = selectedDay;
       selectedDate =
           DateFormat('yyyy-MM-dd').format(selectedDay); // Format full date
+          selectedTime = null; // Reset selected time when date changes
     });
 
-    // Fetch unavailable times for selected date
     context.read<AppointmentProvider>().fetchUnavailableTimes(selectedDay);
-    // Refresh unavailable times when date changes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context
           .read<AppointmentProvider>()
@@ -119,16 +115,24 @@ class _DoctorDetailsState extends State<DoctorDetails> {
         firstDayOfWeekIndex == 0 ? 7 : firstDayOfWeekIndex;
     final int currentWeekday = currentDate.weekday;
 
-    // Find the start of the NEXT week
     int daysToAdd = (targetWeekday - currentWeekday + 7) % 7;
     DateTime startOfNextWeek = currentDate.add(Duration(days: daysToAdd));
 
-    // Generate the next 7 days
     return List.generate(
         7, (index) => startOfNextWeek.add(Duration(days: index)));
   }
 
-  // Modified time selection grid
+  Widget _buildTimeGridConditional() {
+    if (selectedDate == null) {
+      return Opacity(
+        opacity: 0.3,
+        child: IgnorePointer(child: _buildTimeGrid()),
+      );
+    } else {
+      return _buildTimeGrid();
+    }
+  }
+
   Widget _buildTimeGrid() {
     final unavailableTimes =
         context.watch<AppointmentProvider>().unavailableTimes;
@@ -157,6 +161,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
               mainText: timeStr,
               onSelect: isUnavailable ? null : onTimeSelected,
               isAvailable: !isUnavailable,
+              isSelected: selectedTime == timeStr, // Pass selection state
             );
           }).toList(),
         ),
@@ -182,12 +187,10 @@ class _DoctorDetailsState extends State<DoctorDetails> {
 
     try {
       final formattedDate = _parseSelectedDateTime();
-
       await context.read<AppointmentProvider>().changeAppointmentTime(
         widget.appointment!.id!,
         {'dateAppointment': formattedDate.toIso8601String()},
       );
-
       showSuccessDialog(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -197,35 +200,30 @@ class _DoctorDetailsState extends State<DoctorDetails> {
   }
 
   DateTime _parseSelectedDateTime() {
-    // Parse date from "yyyy-MM-dd" format
     final dateParts = selectedDate!.split('-');
     final year = int.parse(dateParts[0]);
     final month = int.parse(dateParts[1]);
     final day = int.parse(dateParts[2]);
 
-    // Parse time from "hh:mm a" format
     final timeParts = selectedTime!.split(' ');
     final hourMinute = timeParts[0].split(':');
     int hour = int.parse(hourMinute[0]);
     final minute = int.parse(hourMinute[1]);
 
-    // Convert to 24-hour format
     if (timeParts[1] == 'PM' && hour != 12) {
       hour += 12;
     } else if (timeParts[1] == 'AM' && hour == 12) {
       hour = 0;
     }
 
-    // Create combined DateTime in local timezone
     final localDateTime = DateTime(year, month, day, hour, minute);
 
     // Convert to UTC before sending to backend
-    return localDateTime.toUtc();
+    return localDateTime;
   }
 
   void _handleNewAppointment() async{
     final doctor = await _doctorFuture;
-
     Navigator.pushReplacement(
       context,
       PageTransition(
@@ -270,7 +268,6 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                   ),
                   child: Image.asset(
                     'assets/done_24px.png',
-                    // Update with your actual image path
                     width: 60,
                     height: 60,
                   ),
@@ -356,8 +353,6 @@ class _DoctorDetailsState extends State<DoctorDetails> {
               toolbarHeight: 100,
               backgroundColor: Colors.white,
             ),
-
-            // Body with scrollable content
             body: SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -416,11 +411,14 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                           DateTime date = weekDates[index];
                           String dayAbbreviation =
                               DateFormat('E', 'fr').format(date);
-                          String dayNumber = DateFormat('d').format(date);
+                          // Normalize date for comparison
+                          final normalizedDate = DateTime(date.year, date.month, date.day);
+                          final normalizedSelectedDate = DateTime(_selectedDateTime.year, _selectedDateTime.month, _selectedDateTime.day);
                           return date_Select(
-                            date: dayNumber,
+                            date: normalizedDate, // Pass full DateTime
                             maintext: dayAbbreviation,
                             onSelect: onDateSelected,
+                            isSelected: normalizedDate == normalizedSelectedDate, // Pass selection state
                           );
                         },
                       ),
@@ -428,14 +426,12 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                     //const SizedBox(height: 20),
 
                     // Time selection grid
-                    _buildTimeGrid(),
+                    _buildTimeGridConditional(),
                     const SizedBox(height: 10), // Space for bottom bar
                   ],
                 ),
               ),
             ),
-
-            // Bottom navigation bar
             bottomNavigationBar: BottomAppBar(
               shape: const CircularNotchedRectangle(),
               child: Padding(
@@ -456,18 +452,22 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                       ),
                     ),
                     GestureDetector(
-                      onTap: () {
+                      onTap: (selectedDate != null && selectedTime != null)
+                          ? () {
                         if (widget.isUpdateMode) {
                           _handleUpdateAppointment();
                         } else {
                           _handleNewAppointment();
                         }
-                      },
+                      }
+                          : null,
                       child: Container(
                         height: 60,
                         width: 200,
                         decoration: BoxDecoration(
-                          color: const Color.fromARGB(255, 2, 179, 149),
+                          color: (selectedDate != null && selectedTime != null)
+                              ? const Color.fromARGB(255, 2, 179, 149)
+                              : const Color.fromARGB(50, 2, 179, 149),
                           borderRadius: BorderRadius.circular(30),
                         ),
                         child: Center(
