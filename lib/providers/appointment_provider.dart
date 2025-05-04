@@ -10,6 +10,7 @@ class AppointmentProvider with ChangeNotifier {
   final ApiService _apiService = ApiService();
   List<Appointment> _appointments = [];
   List<Appointment> _plannedAppointments = [];
+  List<Appointment> _completeAppointments = [];
   List<Appointment> _canceledAppointments = [];
   List<TimeSlot> _unavailableTimes = [];
   Appointment? _currentAppointment;
@@ -29,6 +30,7 @@ class AppointmentProvider with ChangeNotifier {
   String? get errorMessage => _errorMessage;
 
   List<Appointment> get plannedAppointments => _plannedAppointments;
+  List<Appointment> get completeAppointments => _completeAppointments;
   List<Appointment> get canceledAppointments => _canceledAppointments;
 
   Future<void> addAppointment(
@@ -155,6 +157,9 @@ class AppointmentProvider with ChangeNotifier {
       // Initialize separate lists using enum comparison
       _plannedAppointments = appointments.where((a) =>
       a.etat == EtatAppointment.PLANIFIE).toList();
+
+      _completeAppointments = appointments.where((a) =>
+      a.etat == EtatAppointment.COMPLETE).toList();
 
       _canceledAppointments = appointments.where((a) =>
       a.etat == EtatAppointment.ANNULE).toList();
