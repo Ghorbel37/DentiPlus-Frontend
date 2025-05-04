@@ -69,8 +69,8 @@ class _appointmentState extends State<appointment> {
     try {
       final formattedDate = _parseSelectedDateTime();
       // Verify the values
-      print('Consultation ID: ${_selectedConsultation!.id}');
-      print('Formatted Date: ${formattedDate.toIso8601String()}');
+      //print('Consultation ID: ${_selectedConsultation!.id}');
+      //print('Formatted Date: ${formattedDate.toIso8601String()}');
 
       await context.read<AppointmentProvider>().addAppointment(
         _selectedConsultation!.id!, // Will be non-null here
