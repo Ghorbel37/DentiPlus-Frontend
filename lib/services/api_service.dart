@@ -157,7 +157,7 @@ class ApiService {
     final token = prefs.getString('access_token') ?? '';
 
     // Optional: Debug print the token (remove in production)
-    print("Using token: $token");
+    //print("Using token: $token");
 
     final url = Uri.parse(Config.updatePasswordUrl);
     final response = await http.put(
@@ -420,7 +420,7 @@ class ApiService {
     final token = prefs.getString('access_token') ?? '';
 
     // Optional: Debug print the token (remove in production)
-    print("Using token: $token");
+    //print("Using token: $token");
     // Here you could pass a ConsultationCreate model or simply a Map.
     final url = Uri.parse(Config.createConsultationUrl);
     final response = await http.post(
@@ -456,7 +456,7 @@ class ApiService {
     final token = prefs.getString('access_token') ?? '';
 
     // Optional: Debug print the token (remove in production)
-    print("Using token: $token");
+    //print("Using token: $token");
     final url = Uri.parse(Config.getConsultationUrl(consultationId));
     final response = await http.get(
       url,
@@ -477,7 +477,7 @@ class ApiService {
     final token = prefs.getString('access_token') ?? '';
 
     // Optional: Debug print the token (remove in production)
-    print("Using token: $token");
+    //print("Using token: $token");
 
     final url = Uri.parse(Config.getConsultationChatHistoryUrl(consultationId));
     final response = await http.get(
@@ -544,7 +544,7 @@ class ApiService {
     final token = prefs.getString('access_token') ?? '';
 
     // Optional: Debug print the token (remove in production)
-    print("Using token: $token");
+    //print("Using token: $token");
 
     final url = Uri.parse(Config.sendChatMessageUrl(consultationId));
     final response = await http.post(
@@ -563,6 +563,9 @@ class ApiService {
   }
 
   Future<Consultation> finishConsultationChat(int consultationId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access_token') ?? '';
+
     final url = Uri.parse(Config.finishConsultationUrl(consultationId));
     final response = await http.post(url);
     if (response.statusCode == 200) {
