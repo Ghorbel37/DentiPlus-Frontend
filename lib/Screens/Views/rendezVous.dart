@@ -7,8 +7,9 @@ import 'package:denti_plus/Screens/Widgets/TabbarPages/tab1.dart';
 import 'package:denti_plus/Screens/Widgets/TabbarPages/tab2.dart';
 import 'package:denti_plus/Screens/Login-Signup/login.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-
+import '../../providers/appointment_provider.dart';
 import '../Widgets/consultationCard.dart';
 import 'chat_screen.dart';
 import 'doctor_details_screen.dart';
@@ -20,20 +21,36 @@ class Rendezvous extends StatefulWidget {
   _TabBarExampleState createState() => _TabBarExampleState();
 }
 
-class _TabBarExampleState extends State<Rendezvous>
-    with SingleTickerProviderStateMixin {
+class _TabBarExampleState extends State<Rendezvous> with SingleTickerProviderStateMixin {
   late TabController tabController;
+  List<dynamic> _reconsultations = []; // Store reconsultations
+  bool _loadingConsultations = true; // Track loading state
 
   @override
   void initState() {
     super.initState();
     tabController = TabController(length: 3, vsync: this);
+    _fetchReconsultations(); // Fetch reconsultations on initialization
   }
 
   @override
   void dispose() {
     tabController.dispose();
     super.dispose();
+  }
+
+  Future<void> _fetchReconsultations() async {
+    try {
+      final provider = context.read<AppointmentProvider>();
+      final consultations = await provider.fetchConsultationsReconsultaion();
+      print('Fetched reconsultations: ${consultations.length} items');
+      setState(() {
+        _reconsultations = consultations;
+        _loadingConsultations = false;
+      });
+    } catch (e) {
+      setState(() => _loadingConsultations = false);
+    }
   }
 
   @override
@@ -152,9 +169,10 @@ class _TabBarExampleState extends State<Rendezvous>
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: _loadingConsultations || _reconsultations.isEmpty
+          ? null
+          : FloatingActionButton(
         onPressed: () {
-          // Navigate to the conversation screen or start a new chat
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -164,7 +182,7 @@ class _TabBarExampleState extends State<Rendezvous>
           );
         },
         backgroundColor: const Color.fromARGB(255, 254, 92, 92),
-        child: Icon(Icons.add_box, color: Colors.white),
+        child: const Icon(Icons.add_box, color: Colors.white),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
