@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:denti_plus/modals/chat_messageModal.dart';
 import 'package:denti_plus/services/api_service.dart';
 
+import '../modals/enums.dart';
+
 class ChatProvider extends ChangeNotifier {
   final ApiService _apiService = ApiService();
 
@@ -25,31 +27,51 @@ class ChatProvider extends ChangeNotifier {
     try {
       final messages = await _apiService.getConsultationChatHistory(consultationId);
       _chatHistory = messages;
+      print('Fetched chat history: ${messages.length} messages');
     } catch (e) {
       _errorMessage = e.toString();
+      print('Error fetching chat history: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  /// Send a new user message, then reload the chat history.
+  /// Send a new user message, display it immediately, then reload the chat history.
   Future<void> sendMessage(int consultationId, String message) async {
-    if (message.isEmpty) return;
+    if (message.isEmpty || _isSending) return;
 
     _isSending = true;
     _errorMessage = null;
     notifyListeners();
 
-    try {
-      // Call backend; it will persist both user + assistant messages.
-      await _apiService.sendChatMessage(consultationId, {'message': message});
+    // Create a temporary user message
+    final tempMessage = ChatMessage(
+      id: DateTime.now().millisecondsSinceEpoch, // Temporary unique ID
+      consultationId: consultationId,
+      content: message,
+      senderType: MessageSenderType.USER,
+      timestamp: DateTime.now(),
+      consultation: null, // Not needed for temporary message
+    );
 
-      // Re-fetch entire history to pick up both sides.
+    // Add the message to chat history immediately
+    _chatHistory.add(tempMessage);
+    print('Added user message locally: $message');
+    notifyListeners();
+
+    try {
+      // Send message to backend
+      await _apiService.sendChatMessage(consultationId, {'message': message});
+      print('Server response received for message: $message');
+
+      // Re-fetch entire history to pick up both user and assistant messages
       await fetchChatHistory(consultationId);
-      notifyListeners();
     } catch (e) {
       _errorMessage = e.toString();
+      print('Error sending message: $e');
+      // Remove the temporary message on failure
+      _chatHistory.removeWhere((msg) => msg.id == tempMessage.id);
     } finally {
       _isSending = false;
       notifyListeners();
