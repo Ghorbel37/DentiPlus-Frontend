@@ -567,7 +567,13 @@ class ApiService {
     final token = prefs.getString('access_token') ?? '';
 
     final url = Uri.parse(Config.finishConsultationUrl(consultationId));
-    final response = await http.post(url);
+    final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        }
+      );
     if (response.statusCode == 200) {
       return Consultation.fromJson(jsonDecode(response.body));
     }
