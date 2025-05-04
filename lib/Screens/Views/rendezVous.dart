@@ -43,7 +43,7 @@ class _TabBarExampleState extends State<Rendezvous> with SingleTickerProviderSta
     try {
       final provider = context.read<AppointmentProvider>();
       final consultations = await provider.fetchConsultationsReconsultaion();
-      print('Fetched reconsultations: ${consultations.length} items');
+      // print('Fetched reconsultations: ${consultations.length} items');
       setState(() {
         _reconsultations = consultations;
         _loadingConsultations = false;
