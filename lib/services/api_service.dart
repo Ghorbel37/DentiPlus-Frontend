@@ -493,6 +493,29 @@ class ApiService {
     }
     return [];
   }
+
+  Future<List<Consultation>> getConsultationsReconsultation() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access_token') ?? '';
+
+    final url = Uri.parse('${Config.baseUrl}/consultation-patient/reconsultations/available/');
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      return data.map((e) => Consultation.fromJson(e)).toList();
+    }
+
+    throw Exception('Failed to fetch consultations: ${response.statusCode}');
+  }
+
   Future<List<Consultation>> getConsultationsByEtat(String etat) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('access_token') ?? '';

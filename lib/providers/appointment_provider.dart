@@ -135,6 +135,19 @@ class AppointmentProvider with ChangeNotifier {
     }
   }
 
+  Future<List<Consultation>> fetchConsultationsReconsultaion() async {
+    _startLoading();
+    try {
+      final consultations = await _apiService.getConsultationsReconsultation();
+      return consultations;
+    } catch (e) {
+      _handleError(e);
+      rethrow;
+    } finally {
+      _stopLoading();
+    }
+  }
+
   Future<List<Consultation>> fetchConsultationsByEtat(String etat) async {
     _startLoading();
     try {

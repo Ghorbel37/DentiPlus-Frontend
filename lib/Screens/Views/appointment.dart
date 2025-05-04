@@ -40,7 +40,7 @@ class _appointmentState extends State<appointment> {
     try {
       final provider = context.read<AppointmentProvider>();
       final consultations =
-          await provider.fetchConsultationsByEtat('RECONSULTATION');
+          await provider.fetchConsultationsReconsultaion();
 
       setState(() {
         _reconsultations = consultations;
