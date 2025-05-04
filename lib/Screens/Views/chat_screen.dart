@@ -58,6 +58,24 @@ class _ChatScreenState extends State<ChatScreen> {
     super.dispose();
   }
 
+  /// Handle finishing the conversation with API call and UI feedback.
+  Future<void> _handleFinishConversation() async {
+    final success =
+    await _chatProvider.finishConsultation(widget.consultation.id!);
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Consultation finished successfully")),
+      );
+      Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(
+                _chatProvider.errorMessage ?? "Failed to finish consultation")),
+      );
+    }
+  }
+
   AppBar _buildAppBar() => AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -101,11 +119,27 @@ class _ChatScreenState extends State<ChatScreen> {
           },
         ),
         actions: [
-          _appBarIcon("lib/icons/video_call.png"),
+      Consumer<ChatProvider>(
+        builder: (context, prov, child) {
+          return Row(
+            children: [
+              if (prov.chatHistory.isNotEmpty &&
+                  !isConsultationClosed &&
+                  !prov.isFinishing)
+                IconButton(
+                  icon: const Icon(FontAwesomeIcons.circleCheck,
+                      color: Colors.teal, size: 24),
+                  onPressed: _handleFinishConversation,
+                  tooltip: 'Finish Conversation',
+                ),
           _appBarIcon("lib/icons/call.png"),
           _appBarIcon("lib/icons/more.png"),
         ],
       );
+        },
+      ),
+    ],
+  );
 
   Widget _appBarIcon(String path) => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8),
