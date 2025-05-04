@@ -30,7 +30,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
   bool get isConsultationClosed {
     return widget.consultation.etat == EtatConsultation.VALIDE ||
-        widget.consultation.etat == EtatConsultation.RECONSULTATION;
+        widget.consultation.etat == EtatConsultation.RECONSULTATION ||
+        widget.consultation.etat == EtatConsultation.EN_ATTENTE;
   }
 
   @override
@@ -203,7 +204,9 @@ class _ChatScreenState extends State<ChatScreen> {
       child: Text(
         widget.consultation.etat == EtatConsultation.VALIDE
             ? "This consultation is validated. No new messages can be sent."
-            : "This consultation requires a follow-up. Please schedule a new consultation.",
+            : widget.consultation.etat == EtatConsultation.RECONSULTATION
+            ? "This consultation requires a follow-up. Please schedule a new consultation."
+            : "This consultation is pending. Please wait for confirmation.",
         style: GoogleFonts.poppins(
           color: Colors.grey,
           fontStyle: FontStyle.italic,
