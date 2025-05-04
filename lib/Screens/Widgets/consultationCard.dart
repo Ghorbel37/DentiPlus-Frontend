@@ -25,10 +25,13 @@ class ConsultationCard extends StatelessWidget {
     // Determine the color of the side bar based on etat.
     Color sideBarColor = Colors.black45;
     if (etat.toString().contains("RECONSULTATION")) {
-      sideBarColor = Colors.red;
+      sideBarColor = Colors.red.shade600;
     }
     if (etat.toString().contains("VALIDE")) {
-      sideBarColor = const Color.fromARGB(255, 3, 190, 150);
+      sideBarColor = Colors.green.shade600;
+    }
+    if (etat.toString().contains("EN_ATTENTE")) {
+      sideBarColor = Colors.transparent;
     }
     return Center(
         child: Container(
