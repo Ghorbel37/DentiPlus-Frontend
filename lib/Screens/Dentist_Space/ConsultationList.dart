@@ -86,7 +86,7 @@ class _TabBarExampleState extends State<Consultationlist>
                       decoration: BoxDecoration(
                         border: Border.all(
                           width: 2,
-                          color: const Color.fromARGB(255, 3, 190, 150),
+                          color: Colors.green.shade600,
                         ),
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(25),
@@ -104,7 +104,7 @@ class _TabBarExampleState extends State<Consultationlist>
                         child: TabBar(
                           controller: tabController,
                           indicator: BoxDecoration(
-                            color: const Color.fromARGB(255, 3, 190, 150),
+                            color: Colors.green.shade600,
                             borderRadius: BorderRadius.circular(20),
                           ),
                           indicatorSize: TabBarIndicatorSize.tab,

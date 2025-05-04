@@ -150,7 +150,7 @@ class _appointmentState extends State<Consdetails> {
                         height: 50,
                         width: 50,
                         decoration: BoxDecoration(
-                          color: const Color.fromARGB(255, 254, 92, 92),
+                          color: Colors.red.shade600,
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: Center(
@@ -173,7 +173,7 @@ class _appointmentState extends State<Consdetails> {
                         height: 60,
                         width: 200,
                         decoration: BoxDecoration(
-                          color: const Color.fromARGB(255, 2, 179, 149),
+                          color: Colors.green.shade600,
                           borderRadius: BorderRadius.circular(30),
                         ),
                         child: Center(
@@ -301,7 +301,7 @@ class _appointmentState extends State<Consdetails> {
         return Dialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
-            side: BorderSide(color: Colors.teal, width: 3),
+            side: BorderSide(color: Colors.green.shade600, width: 3),
           ),
           elevation: 10,
           child: Container(
@@ -402,7 +402,7 @@ class _appointmentState extends State<Consdetails> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
             side: BorderSide(
-                color: const Color.fromARGB(255, 254, 92, 92), width: 3),
+                color: Colors.red.shade600, width: 3),
           ),
           elevation: 10,
           child: Container(
@@ -466,7 +466,7 @@ class _appointmentState extends State<Consdetails> {
                         Navigator.pop(context);
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(255, 254, 92, 92),
+                        backgroundColor: Colors.red.shade600,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
                         ),

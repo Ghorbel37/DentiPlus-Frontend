@@ -152,7 +152,7 @@ class _SheduleCardState extends State<ConsCard> {
                           height: MediaQuery.of(context).size.height * 0.045,
                           width: MediaQuery.of(context).size.width * 0.38,
                           decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 254, 92, 92),
+                            color: Colors.red.shade600,
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Center(
@@ -176,7 +176,7 @@ class _SheduleCardState extends State<ConsCard> {
                           height: MediaQuery.of(context).size.height * 0.045,
                           width: MediaQuery.of(context).size.width * 0.38,
                           decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 4, 190, 144),
+                            color: Colors.green.shade600,
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Center(
@@ -273,7 +273,7 @@ class _SheduleCardState extends State<ConsCard> {
                         Navigator.pop(context);
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.teal,
+                        backgroundColor: Colors.green.shade600,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
                         ),
@@ -311,7 +311,7 @@ class _SheduleCardState extends State<ConsCard> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
             side: BorderSide(
-                color: const Color.fromARGB(255, 254, 92, 92), width: 3),
+                color: Colors.green.shade600),
           ),
           elevation: 10,
           child: Container(
@@ -375,7 +375,7 @@ class _SheduleCardState extends State<ConsCard> {
                         Navigator.pop(context);
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(255, 254, 92, 92),
+                        backgroundColor: Colors.red.shade600,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
                         ),
