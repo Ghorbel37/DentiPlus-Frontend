@@ -46,13 +46,13 @@ class AuthProvider extends ChangeNotifier {
       final email = prefs.getString('email') ?? '';
       final role = prefs.getString('role') ?? '';
       final userId = prefs.getString('user_id') ?? '0';
+      await fetchProfilePhoto();
 
       if (userJson != null) {
         _userDetect = PatientCreate.fromJson(json.decode(userJson));
       }
     }
     _isInitializing = false;
-    await fetchProfilePhoto();
     notifyListeners();
   }
 
