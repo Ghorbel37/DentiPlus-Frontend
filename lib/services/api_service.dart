@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../modals/IntegrityResult.dart';
 import '../modals/TimeSlot.dart';
 import '../modals/diagModal.dart';
 import 'config.dart';
@@ -823,5 +824,37 @@ class ApiService {
       return jsonDecode(response.body);
     }
     throw Exception('Failed to diagnose (FR)');
+  }
+
+// --------------------
+// LLM DIAGNOSIS ENDPOINTS (if applicable)
+// --------------------
+
+  Future<IntegrityResult> verifyConsultationIntegrity(
+      int consultationId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access_token') ?? '';
+
+    final url = Uri.parse('${Config.baseUrl}/verify-integrity/$consultationId');
+    final response = await http.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> body = jsonDecode(response.body);
+      return IntegrityResult.fromJson(body);
+    } else if (response.statusCode == 404) {
+      throw Exception('Consultation not found (404)');
+    } else {
+      // you can parse error detail if your backend returns one
+      final err =
+      response.body.isNotEmpty ? jsonDecode(response.body)['detail'] : null;
+      throw Exception(
+          'Failed to verify integrity: ${err ?? response.statusCode}');
+    }
   }
 }
