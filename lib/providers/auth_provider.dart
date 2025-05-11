@@ -43,14 +43,19 @@ class AuthProvider extends ChangeNotifier {
     final userJson = prefs.getString('user_object');
 
     if (token != null) {
-      final email = prefs.getString('email') ?? '';
-      final role = prefs.getString('role') ?? '';
-      final userId = prefs.getString('user_id') ?? '0';
-      await fetchProfilePhoto();
-
-      if (userJson != null) {
-        _userDetect = PatientCreate.fromJson(json.decode(userJson));
+      // ① If the token is expired, force logout
+      if (JwtDecoder.isExpired(token)) {
+        await logout();
+      } else {
+        // ② Otherwise restore your saved user
+        if (userJson != null) {
+          _userDetect = PatientCreate.fromJson(json.decode(userJson));
+        }
+        await fetchProfilePhoto();
       }
+    } else {
+      // no token at all → not logged in
+      await logout();
     }
     _isInitializing = false;
     notifyListeners();
@@ -204,10 +209,12 @@ class AuthProvider extends ChangeNotifier {
   }
 
   ///pass word change
-  Future<Map<String, dynamic>> updatePassword(String currentPassword, String newPassword) async {
+  Future<Map<String, dynamic>> updatePassword(
+      String currentPassword, String newPassword) async {
     try {
       // Call the ApiService's updatePassword method.
-      final response = await _apiService.updatePassword(currentPassword, newPassword);
+      final response =
+          await _apiService.updatePassword(currentPassword, newPassword);
       // Optionally process the response (e.g., refresh token, update local state) if needed.
       // Here we just return the response.
       return response;
@@ -215,6 +222,7 @@ class AuthProvider extends ChangeNotifier {
       throw Exception("Failed to update passwordggggg: ${e.toString()}");
     }
   }
+
   Future<void> uploadProfilePhoto(File imageFile) async {
     try {
       _isLoading = true;
@@ -234,20 +242,26 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-
   /// Logs out the current user.
-  Future<void> logout() async {
+  Future logout() async {
+    // Reset all user-related state
     _user = null;
+    _fetchedUser = null;
+    _userDetect = null;
+    _profilePhoto = null;
     _errorMessage = null;
-    // Clear SharedPreferences or any stored session info
+    _isLoading = false;
+
+    // Clear stored session data
     await _clearSession();
+
+    // Notify listeners once after all changes
     notifyListeners();
   }
 
-  Future<void> _clearSession() async {
+  /// Clears the SharedPreferences session data.
+  Future _clearSession() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
-    _userDetect = null;
-    notifyListeners();
   }
 }
