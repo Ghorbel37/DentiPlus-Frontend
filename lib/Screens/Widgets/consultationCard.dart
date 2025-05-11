@@ -137,8 +137,10 @@ class ConsultationCard extends StatelessWidget {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20)),
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
+                              horizontal: 10, vertical: 10),
                           elevation: 0,
+                          minimumSize: const Size(110, 50), // Ensure consistent size for both states
+                          maximumSize: const Size(120, 60),
                         ),
                         onPressed: bcProv.isVerifying
                             ? null
@@ -157,15 +159,16 @@ class ConsultationCard extends StatelessWidget {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Icon(
-                                      !ok ? Icons.check_circle : Icons.error,
+                                      ok ? Icons.check_circle : Icons.error,
                                       size: 60,
-                                      color: !ok ? Colors.green : Colors.red,
+                                      color: ok ? Colors.green : Colors.red,
                                     ),
                                     const SizedBox(height: 16),
                                     Text(
-                                      !ok
-                                          ? "Intégrité Vérifiée"
-                                          : "Intégrité Échouée",
+                                      ok
+                                          ? "Intégrité confirmée via la blockchain"
+                                          : "Échec de la vérification d'intégrité",
+                                      textAlign: TextAlign.center,
                                       style: GoogleFonts.poppins(
                                         fontSize: 18.sp,
                                         fontWeight: FontWeight.w600,
@@ -188,16 +191,27 @@ class ConsultationCard extends StatelessWidget {
                         },
                         child: bcProv.isVerifying
                             ? const SizedBox(
-                          height: 16,
-                          width: 16,
+                          height: 24, // Match approximate text height
+                          width: 24,
                           child: CircularProgressIndicator(
                               strokeWidth: 2,
                               valueColor:
                               AlwaysStoppedAnimation(Colors.white)),
                         )
-                            : Text("Vérifier",
+                            : ConstrainedBox(
+                          constraints: const BoxConstraints(
+                            maxWidth: 80, // Constrain text width to force wrapping
+                          ),
+                          child: Text(
+                            "Vérifier intégrité", // Replace with longer text for testing, if needed
                             style: GoogleFonts.poppins(
-                                color: Colors.white, fontSize: 14.sp)),
+                              color: Colors.white,
+                              fontSize: 14.sp,
+                            ),
+                            textAlign: TextAlign.center,
+                            softWrap: true, // Enable text wrapping
+                          ),
+                        ),
                       );
                     },
                   ),
