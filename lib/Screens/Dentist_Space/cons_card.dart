@@ -269,7 +269,9 @@ class _SheduleCardState extends State<ConsCard> {
                         await provider.validateConsultation(
                           widget.idCons,
                           noteController.text.trim(),
-                        );
+                        ).then((_) {
+                          provider.fetchConsultations();
+                        });
                         Navigator.pop(context);
                       },
                       style: ElevatedButton.styleFrom(
@@ -371,7 +373,9 @@ class _SheduleCardState extends State<ConsCard> {
                         await provider.markReCons(
                           widget.idCons,
                           noteController.text.trim(),
-                        );
+                        ).then((_) {
+                          provider.fetchConsultations();
+                        });
                         Navigator.pop(context);
                       },
                       style: ElevatedButton.styleFrom(
