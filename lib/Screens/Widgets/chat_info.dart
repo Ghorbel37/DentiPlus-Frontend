@@ -24,14 +24,14 @@ class chat_info extends StatelessWidget {
           Text(
             name,
             style: GoogleFonts.poppins(
-                fontSize: 16.sp,
+                fontSize: 18.sp,
                 fontWeight: FontWeight.w500,
                 color: Color.fromARGB(255, 0, 131, 113)),
           ),
           Text(
             "Votre assistant pour votre protection",
             style: GoogleFonts.poppins(
-                fontSize: 12.sp,
+                fontSize: 14.sp,
                 fontWeight: FontWeight.w500,
                 color: Color.fromARGB(255, 136, 136, 136)),
           )
