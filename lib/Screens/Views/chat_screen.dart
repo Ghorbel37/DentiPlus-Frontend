@@ -142,24 +142,42 @@ class _ChatScreenState extends State<ChatScreen> {
       },
     ),
     actions: [
-      Consumer<ChatProvider>(
-        builder: (context, prov, child) {
-          return Row(
-            children: [
-              if (prov.chatHistory.isNotEmpty &&
-                  !isConsultationClosed &&
-                  !prov.isFinishing)
-                IconButton(
-                  icon: const Icon(FontAwesomeIcons.checkCircle,
-                      color: Colors.teal, size: 24),
-                  onPressed: _handleFinishConversation,
-                  tooltip: 'Finish Conversation',
-                ),
-              _appBarIcon("lib/icons/call.png"),
-              _appBarIcon("lib/icons/more.png"),
-            ],
-          );
-        },
+      Padding(
+        padding: const EdgeInsets.only(right: 16),
+        child: Consumer<ChatProvider>(
+          builder: (context, prov, _) => ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color.fromARGB(255, 0, 131, 113),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              elevation: 0,
+            ),
+            onPressed: (prov.chatHistory.isEmpty ||
+                isConsultationClosed ||
+                prov.isFinishing)
+                ? null
+                : _handleFinishConversation,
+            child: prov.isFinishing
+                ? const SizedBox(
+              height: 16,
+              width: 16,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation(Colors.white),
+              ),
+            )
+                : Text(
+              "Finir",
+              style: GoogleFonts.poppins(
+                color: Colors.white,
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ),
       ),
     ],
   );
