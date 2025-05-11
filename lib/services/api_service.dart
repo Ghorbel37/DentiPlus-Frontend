@@ -835,7 +835,7 @@ class ApiService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('access_token') ?? '';
 
-    final url = Uri.parse('${Config.baseUrl}/verify-integrity/$consultationId');
+    final url = Uri.parse('${Config.baseUrl}/consultation-patient/verify-integrity/$consultationId');
     final response = await http.get(
       url,
       headers: {
