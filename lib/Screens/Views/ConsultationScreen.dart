@@ -173,6 +173,7 @@ class _ConsultationscreenState extends State<Consultationscreen>
                                     });
                                   },
                                   child: ConsultationCard(
+                                    consultationId: consultation.id!,
                                     date: formattedDate,
                                     time: formattedTime,
                                     title: "Consultation ${consultation.id!}",
@@ -209,6 +210,7 @@ class _ConsultationscreenState extends State<Consultationscreen>
                                     });
                                   },
                                   child: ConsultationCard(
+                                    consultationId: consultation.id!,
                                     date: formattedDate,
                                     time: formattedTime,
                                     title: "Consultation ${consultation.id!}",

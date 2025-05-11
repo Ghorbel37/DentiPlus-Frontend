@@ -1,19 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:page_transition/page_transition.dart';
 
+import '../../providers/blockchain_provider.dart';
+import '../../providers/conversation_provider.dart';
 import '../Views/chat_screen.dart'; // Ensure you have imported your chat screen
 
 class ConsultationCard extends StatelessWidget {
   final String date;
   final String time;
   final String title;
+  final int consultationId;
   /// New parameter for the consultation state (etat)
   final String? etat;
 
   const ConsultationCard({
     Key? key,
+    required this.consultationId,
     required this.date,
     required this.time,
     required this.title,
@@ -120,6 +125,83 @@ class ConsultationCard extends StatelessWidget {
                   ),
                 ),
               ),
+              // ── “Check” button ──
+              if (etat.toString().contains("RECONSULTATION") || etat.toString().contains("VALIDE"))
+                Padding(
+                  padding: const EdgeInsets.only(right: 16),
+                  child: Consumer<BlockchainProvider>(
+                    builder: (ctx, bcProv, _) {
+                      return ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF02B397),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20)),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          elevation: 0,
+                        ),
+                        onPressed: bcProv.isVerifying
+                            ? null
+                            : () async {
+                          final ok =
+                          await bcProv.verifyIntegrity(consultationId);
+                          // show result dialog
+                          await showDialog(
+                            context: context,
+                            builder: (_) => Dialog(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12)),
+                              child: Padding(
+                                padding: const EdgeInsets.all(20),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      !ok ? Icons.check_circle : Icons.error,
+                                      size: 60,
+                                      color: !ok ? Colors.green : Colors.red,
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      !ok
+                                          ? "Intégrité Vérifiée"
+                                          : "Intégrité Échouée",
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 18.sp,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+
+                          // if success, trigger an upstream refresh
+                          // on success, refresh the conversation list
+                          if (ok) {
+                            context
+                                .read<ConversationProvider>()
+                                .fetchConsultations();
+                          }
+                        },
+                        child: bcProv.isVerifying
+                            ? const SizedBox(
+                          height: 16,
+                          width: 16,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor:
+                              AlwaysStoppedAnimation(Colors.white)),
+                        )
+                            : Text("Vérifier",
+                            style: GoogleFonts.poppins(
+                                color: Colors.white, fontSize: 14.sp)),
+                      );
+                    },
+                  ),
+                ),
             ],
           ),
         ),
