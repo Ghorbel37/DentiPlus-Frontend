@@ -22,7 +22,7 @@ class doctorList extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       child: Center(
         child: Container(
-          height: MediaQuery.of(context).size.height * 0.1500,
+          height: MediaQuery.of(context).size.height * 0.1700,
           width: MediaQuery.of(context).size.width * 0.9,
           decoration: BoxDecoration(
             color: Colors.white,
@@ -49,7 +49,7 @@ class doctorList extends StatelessWidget {
                 width: 10,
               ),
               Container(
-                height: MediaQuery.of(context).size.height * 0.1200,
+                height: MediaQuery.of(context).size.height * 0.1400,
                 width: MediaQuery.of(context).size.width * 0.4,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
