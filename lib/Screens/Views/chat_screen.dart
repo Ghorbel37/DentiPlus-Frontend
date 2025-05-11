@@ -221,10 +221,10 @@ class _ChatScreenState extends State<ChatScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Text(
         widget.consultation.etat == EtatConsultation.VALIDE
-            ? "This consultation is validated. No new messages can be sent."
+            ? "Cette consultation est validée. Aucun nouveau message ne peut être envoyé."
             : widget.consultation.etat == EtatConsultation.RECONSULTATION
-            ? "This consultation requires a follow-up. Please schedule a new consultation."
-            : "This consultation is pending. Please wait for confirmation.",
+            ? "Cette consultation nécessite un suivi. Veuillez prendre rendez-vous pour une nouvelle consultation."
+            : "Cette consultation est en attente. Veuillez attendre la confirmation du médecin.",
         style: GoogleFonts.poppins(
           color: Colors.grey,
           fontStyle: FontStyle.italic,
