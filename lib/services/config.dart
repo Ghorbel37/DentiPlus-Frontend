@@ -42,6 +42,8 @@ class Config {
   static String cancelAppointmentUrl(int appointmentId) =>
       '${consultationPatientUrl}appointments/$appointmentId/cancel';
   static String get unavailableTimesUrl => '${consultationPatientUrl}unavailable-times';
+  //Blockchain
+  static String getIntegrity(int consultationID) => '${consultationPatientUrl}verify-integrity/$consultationID';
 
   // Diagnostics
   static const String diagnosticsUrl = '$baseUrl/diagnostics';
