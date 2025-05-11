@@ -242,7 +242,8 @@ class _DoctorDetailsState extends State<DoctorDetails> {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        Future.delayed(const Duration(seconds: 2), () {
+        Future.delayed(const Duration(seconds: 2), () async {
+          await context.read<AppointmentProvider>().fetchPatientAppointments();
           Navigator.of(context).pop(); // Close dialog
           Navigator.of(context).pop(); // Return to previous screen
         });
