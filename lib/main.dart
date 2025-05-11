@@ -1,5 +1,6 @@
 import 'package:denti_plus/Screens/Widgets/RootWrapper.dart';
 import 'package:denti_plus/providers/appointment_provider.dart';
+import 'package:denti_plus/providers/blockchain_provider.dart';
 import 'package:denti_plus/providers/chat_provider.dart';
 import 'package:denti_plus/providers/conversation_provider.dart';
 import 'package:denti_plus/providers/doctor_consultations_provider.dart';
@@ -37,6 +38,7 @@ class DentiPlus extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ChatProvider()),
         ChangeNotifierProvider(create: (_) => DoctorConsultationsProvider()),
         ChangeNotifierProvider(create: (_) => AppointmentProvider()),
+        ChangeNotifierProvider(create: (_) => BlockchainProvider()),
       ],
       child: ResponsiveSizer(
         builder: (context, orientation, screenType) {
