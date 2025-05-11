@@ -180,14 +180,6 @@ class ConsultationCard extends StatelessWidget {
                               ),
                             ),
                           );
-
-                          // if success, trigger an upstream refresh
-                          // on success, refresh the conversation list
-                          if (ok) {
-                            context
-                                .read<ConversationProvider>()
-                                .fetchConsultations();
-                          }
                         },
                         child: bcProv.isVerifying
                             ? const SizedBox(
