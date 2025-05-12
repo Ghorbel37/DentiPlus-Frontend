@@ -329,7 +329,7 @@ class ApiService {
       },
     );
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
+      final data = jsonDecode(utf8.decode(response.bodyBytes));
       return Diagmodal.fromJson(data);
     }
     throw Exception('No consultation found with id : $id');
@@ -489,7 +489,7 @@ class ApiService {
       },
     );
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body) as List;
+      final data = jsonDecode(utf8.decode(response.bodyBytes)) as List;
       return data.map((json) => ChatMessage.fromJson(json)).toList();
     }
     return [];
