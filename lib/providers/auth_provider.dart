@@ -43,6 +43,9 @@ class AuthProvider extends ChangeNotifier {
     final userJson = prefs.getString('user_object');
 
     if (token != null) {
+      final email = prefs.getString('email') ?? '';
+      final role = prefs.getString('role') ?? '';
+      final userId = prefs.getString('user_id') ?? '0';
       // ① If the token is expired, force logout
       if (JwtDecoder.isExpired(token)) {
         await logout();
@@ -219,7 +222,7 @@ class AuthProvider extends ChangeNotifier {
       // Here we just return the response.
       return response;
     } catch (e) {
-      throw Exception("Failed to update passwordggggg: ${e.toString()}");
+      throw Exception("Failed to update password: ${e.toString()}");
     }
   }
 
