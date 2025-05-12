@@ -106,10 +106,10 @@ class _appointmentState extends State<Consdetails> {
 
                   // ** Payment Method Selection with Dropdown **
                   SizedBox(height: 20),
-                  buildSectionTitle("Diagnostique d'Assistant"),
+                  buildSectionTitle("Resumé de la conversation"),
                   SizedBox(height: 8),
                   Text(
-                    consultation.diagnosis ?? '',
+                    consultation.chatSummary ?? '',
                     style: GoogleFonts.poppins(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w300,
@@ -120,8 +120,22 @@ class _appointmentState extends State<Consdetails> {
                   buildSectionTitle("Avis Docteur"),
                   SizedBox(height: 8),
                   Text(
-                    consultation.doctorNote ??
-                        'Pas encore mentionné votre avis!',
+                    (consultation.doctorNote == null || consultation.doctorNote!.isEmpty)
+                        ? 'Pas encore mentionné votre avis!'
+                        : consultation.doctorNote!,
+                    style: GoogleFonts.poppins(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w300,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  buildSectionTitle("Diagnostic de l'assistant"),
+                  SizedBox(height: 8),
+                  Text(
+                    (consultation.diagnosis == null || consultation.diagnosis!.isEmpty)
+                        ? 'Pas encore généré!'
+                        : consultation.diagnosis!,
                     style: GoogleFonts.poppins(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w300,
