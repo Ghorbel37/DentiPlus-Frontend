@@ -1,3 +1,4 @@
+import 'package:denti_plus/modals/chat_messageModal.dart';
 import 'package:denti_plus/modals/patientCreateModal.dart';
 import 'package:denti_plus/providers/chat_provider.dart';
 import 'package:flutter/material.dart';
@@ -187,25 +188,61 @@ class _ChatScreenState extends State<ChatScreen> {
     child: Image.asset(path, height: 24, width: 24),
   );
 
-  Widget _buildChatBubble(String message, bool isUser) {
+  Widget _buildChatBubble(ChatMessage msg) {
+    final isUser = msg.senderType == MessageSenderType.USER;
+    final isDoctor = msg.senderType == MessageSenderType.DOCTOR;
+
     return Align(
-      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+      alignment: isDoctor
+          ? Alignment.center // Center doctor messages
+          : isUser
+          ? Alignment.centerRight // Right-align user messages
+          : Alignment.centerLeft, // Left-align other messages
       child: Container(
         padding: const EdgeInsets.all(12),
         constraints: BoxConstraints(maxWidth: 70.w),
+        margin: isDoctor
+            ? const EdgeInsets.symmetric(horizontal: 16, vertical: 8) // Extra margin for centered messages
+            : const EdgeInsets.symmetric(vertical: 8), // Standard margin
         decoration: BoxDecoration(
-          color: isUser
+          color: isDoctor
+              ? Colors.blue.shade700 // Distinct color for diagnosis
+              : isUser
               ? const Color.fromARGB(255, 0, 131, 113)
               : const Color(0xFFECE8E8),
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(isUser ? 10 : 0),
+            topLeft: Radius.circular(isUser || isDoctor ? 10 : 0),
             topRight: Radius.circular(isUser ? 0 : 10),
             bottomLeft: const Radius.circular(10),
             bottomRight: const Radius.circular(10),
           ),
         ),
-        child: Text(
-          message,
+        child: isDoctor
+            ? Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              "Réponse docteur:",
+              style: GoogleFonts.poppins(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w600,
+                color: Colors.white70, // Lighter color for prefix
+              ),
+            ),
+            const SizedBox(height: 4), // Space between prefix and content
+            Text(
+              msg.content ?? '',
+              style: GoogleFonts.poppins(
+                fontSize: 15.sp,
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+              ),
+              textAlign: TextAlign.center, // Center text for consistency
+            ),
+          ],
+        )
+            : Text(
+          msg.content ?? '',
           style: GoogleFonts.poppins(
             fontSize: 15.sp,
             fontWeight: FontWeight.w500,
@@ -325,10 +362,9 @@ class _ChatScreenState extends State<ChatScreen> {
                           name: "Consultation ${widget.consultation.id}");
                     }
                     final msg = prov.chatHistory[i - 1];
-                    final isUser = msg.senderType == MessageSenderType.USER;
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: _buildChatBubble(msg.content ?? '', isUser),
+                      child: _buildChatBubble(msg),
                     );
                   },
                 ),
